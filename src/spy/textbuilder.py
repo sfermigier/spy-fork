@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import Union
 from collections.abc import Iterator
 import textwrap
@@ -6,7 +8,7 @@ from contextlib import contextmanager
 
 class TextBuilder:
     level: int  # indentation level
-    lines: list[Union[str, "TextBuilder"]]
+    lines: list[str | TextBuilder]
     use_colors: bool
 
     def __init__(self, *, use_colors: bool = False) -> None:
@@ -33,7 +35,7 @@ class TextBuilder:
         yield
         self.level -= 1
 
-    def make_nested_builder(self) -> "TextBuilder":
+    def make_nested_builder(self) -> TextBuilder:
         """
         Create a new nested TextBuilder, at the current position.
 

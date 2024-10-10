@@ -1,15 +1,17 @@
 from typing import TYPE_CHECKING
+
 from fixedint import FixedInt
+
 from spy import ast
-from spy.location import Loc
-from spy.fqn import FQN
 from spy.errors import SPyTypeError
-from spy.vm.b import B
-from spy.vm.object import W_Object, W_Type
-from spy.vm.function import W_ASTFunc, W_BuiltinFunc
-from spy.vm.astframe import ASTFrame
-from spy.vm.typeconverter import JsRefConv
+from spy.fqn import FQN
+from spy.location import Loc
 from spy.util import magic_dispatch
+from spy.vm.astframe import ASTFrame
+from spy.vm.b import B
+from spy.vm.function import W_ASTFunc, W_BuiltinFunc
+from spy.vm.object import W_Object, W_Type
+from spy.vm.typeconverter import JsRefConv
 
 if TYPE_CHECKING:
     from spy.vm.vm import SPyVM

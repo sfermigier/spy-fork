@@ -1,16 +1,18 @@
-from typing import Annotated, Any, no_type_check
 from pathlib import Path
-import typer
+from typing import Annotated, Any, no_type_check
+
 import py.path
-from spy.magic_py_parse import magic_py_parse
-from spy.errors import SPyError
-from spy.parser import Parser
+import typer
+
 from spy.backend.spy import SPyBackend
-from spy.compiler import Compiler, ToolchainType
 from spy.cbuild import get_toolchain
+from spy.compiler import Compiler, ToolchainType
+from spy.errors import SPyError
+from spy.magic_py_parse import magic_py_parse
+from spy.parser import Parser
 from spy.vm.b import B
-from spy.vm.vm import SPyVM
 from spy.vm.function import W_Func, W_FuncType
+from spy.vm.vm import SPyVM
 
 app = typer.Typer(pretty_exceptions_enable=False)
 
@@ -24,7 +26,6 @@ def boolopt(help: str, names: tuple[str, ...] = ()) -> Any:
 
 
 def do_pyparse(filename: str) -> None:
-
     with open(filename) as f:
         src = f.read()
     mod = magic_py_parse(src)
