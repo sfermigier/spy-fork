@@ -15,11 +15,11 @@ class TestDynamic(CompilerTest):
         # `dynamic` instead of `object`
         mod = self.compile(
             """
-        def foo() -> i32:
-            x: i32 = 1
-            y: dynamic = x
-            return y
-        """
+            def foo() -> i32:
+                x: i32 = 1
+                y: dynamic = x
+                return y
+            """
         )
         assert mod.foo() == 1
 
@@ -28,11 +28,11 @@ class TestDynamic(CompilerTest):
         # a runtime error. The compilation always succeed.
         mod = self.compile(
             """
-        def foo() -> str:
-            x: i32 = 1
-            y: dynamic = x
-            return y
-        """
+            def foo() -> str:
+                x: i32 = 1
+                y: dynamic = x
+                return y
+            """
         )
         msg = "Invalid cast. Expected `str`, got `i32`"
         with pytest.raises(SPyTypeError, match=msg):
@@ -41,22 +41,22 @@ class TestDynamic(CompilerTest):
     def test_dynamic_dispatch_ok(self):
         mod = self.compile(
             """
-        def foo() -> i32:
-            x: dynamic = 1
-            y: dynamic = 2
-            return x + y
-        """
+            def foo() -> i32:
+                x: dynamic = 1
+                y: dynamic = 2
+                return x + y
+            """
         )
         assert mod.foo() == 3
 
     def test_dynamic_runtime_error(self):
         mod = self.compile(
             """
-        def foo() -> i32:
-            x: dynamic = 1
-            y: dynamic = 'hello'
-            return x + y
-        """
+            def foo() -> i32:
+                x: dynamic = 1
+                y: dynamic = 'hello'
+                return x + y
+            """
         )
         msg = re.escape("cannot do `i32` + `str`")
         with pytest.raises(SPyTypeError, match=msg):
@@ -65,25 +65,25 @@ class TestDynamic(CompilerTest):
     def test_mixed_dispatch(self):
         mod = self.compile(
             """
-        def foo() -> i32:
-            x: dynamic = 1
-            y: i32 = 2
-            return x + y
-        """
+            def foo() -> i32:
+                x: dynamic = 1
+                y: i32 = 2
+                return x + y
+            """
         )
         assert mod.foo() == 3
 
     def test_other_ops(self):
         mod = self.compile(
             """
-        def mul(x: dynamic, y: dynamic) -> dynamic: return x  * y
-        def eq (x: dynamic, y: dynamic) -> dynamic: return x == y
-        def neq(x: dynamic, y: dynamic) -> dynamic: return x != y
-        def lt (x: dynamic, y: dynamic) -> dynamic: return x  < y
-        def lte(x: dynamic, y: dynamic) -> dynamic: return x <= y
-        def gt (x: dynamic, y: dynamic) -> dynamic: return x  > y
-        def gte(x: dynamic, y: dynamic) -> dynamic: return x >= y
-        """
+            def mul(x: dynamic, y: dynamic) -> dynamic: return x  * y
+            def eq (x: dynamic, y: dynamic) -> dynamic: return x == y
+            def neq(x: dynamic, y: dynamic) -> dynamic: return x != y
+            def lt (x: dynamic, y: dynamic) -> dynamic: return x  < y
+            def lte(x: dynamic, y: dynamic) -> dynamic: return x <= y
+            def gt (x: dynamic, y: dynamic) -> dynamic: return x  > y
+            def gte(x: dynamic, y: dynamic) -> dynamic: return x >= y
+            """
         )
         assert mod.mul(5, 6) == 30
         assert mod.eq(5, 5) is True
@@ -106,29 +106,29 @@ class TestDynamic(CompilerTest):
     def test_call(self):
         mod = self.compile(
             """
-        def inc(x: i32) -> i32:
-            return x + 1
+            def inc(x: i32) -> i32:
+                return x + 1
 
-        @blue
-        def get_inc() -> dynamic:
-            return inc
+            @blue
+            def get_inc() -> dynamic:
+                return inc
 
-        def foo() -> i32:
-            return get_inc()(7)
-        """
+            def foo() -> i32:
+                return get_inc()(7)
+            """
         )
         assert mod.foo() == 8
 
     def test_wrong_call(self):
         mod = self.compile(
             """
-        @blue
-        def get_inc() -> dynamic:
-            return 'hello'
+            @blue
+            def get_inc() -> dynamic:
+                return 'hello'
 
-        def foo() -> i32:
-            return get_inc()(7)
-        """
+            def foo() -> i32:
+                return get_inc()(7)
+            """
         )
         msg = "cannot call objects of type `str`"
         with pytest.raises(SPyTypeError, match=msg):
@@ -137,12 +137,12 @@ class TestDynamic(CompilerTest):
     def test_setattr(self):
         mod = self.compile(
             """
-        x: i32 = 0
+            x: i32 = 0
 
-        @blue
-        def __INIT__(mod: dynamic):
-            mod.x = 42
-        """
+            @blue
+            def __INIT__(mod: dynamic):
+                mod.x = 42
+            """
         )
         vm = self.vm
         assert mod.x == 42
@@ -153,10 +153,10 @@ class TestDynamic(CompilerTest):
 
         mod = self.compile(
             """
-        def foo() -> void:
-            obj: dynamic = "hello"
-            obj.x = 42
-        """
+            def foo() -> void:
+                obj: dynamic = "hello"
+                obj.x = 42
+            """
         )
         msg = "type `str` does not support assignment to attribute 'x'"
         with pytest.raises(SPyTypeError, match=msg):
