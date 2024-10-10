@@ -53,7 +53,7 @@ from spy.fqn import QN
 
 if TYPE_CHECKING:
     from spy.vm.vm import SPyVM
-    from spy.vm.opimpl import W_OpImpl
+    from spy.vm.opimpl import W_OpImpl, W_Value
 
 # Basic setup of the object model: <object> and <type>
 # =====================================================
