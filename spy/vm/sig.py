@@ -4,6 +4,7 @@ from spy.fqn import QN
 from spy.ast import Color
 from spy.vm.object import W_Object, W_Type, W_Dynamic, w_DynamicType, W_Void
 from spy.vm.function import FuncParam, W_FuncType, W_BuiltinFunc
+
 if TYPE_CHECKING:
     from spy.vm.vm import SPyVM
 
@@ -11,12 +12,13 @@ if TYPE_CHECKING:
 B_w_dynamic = w_DynamicType
 B_w_Void = W_Void._w
 
+
 def is_W_class(x: Any) -> bool:
     return isinstance(x, type) and issubclass(x, W_Object)
 
 
 def to_spy_FuncParam(p: Any) -> FuncParam:
-    if p.name.startswith('w_'):
+    if p.name.startswith("w_"):
         name = p.name[2:]
     else:
         name = p.name
@@ -34,11 +36,10 @@ def functype_from_sig(fn: Callable, color: Color) -> W_FuncType:
     sig = inspect.signature(fn)
     params = list(sig.parameters.values())
     if len(params) == 0:
-        msg = (f"The first param should be 'vm: SPyVM'. Got nothing")
+        msg = f"The first param should be 'vm: SPyVM'. Got nothing"
         raise ValueError(msg)
-    if (params[0].name != 'vm' or
-        params[0].annotation != 'SPyVM'):
-        msg = (f"The first param should be 'vm: SPyVM'. Got '{params[0]}'")
+    if params[0].name != "vm" or params[0].annotation != "SPyVM":
+        msg = f"The first param should be 'vm: SPyVM'. Got '{params[0]}'"
         raise ValueError(msg)
 
     func_params = [to_spy_FuncParam(p) for p in params[1:]]
@@ -55,7 +56,7 @@ def functype_from_sig(fn: Callable, color: Color) -> W_FuncType:
     return W_FuncType(func_params, w_restype, color=color)
 
 
-def spy_builtin(qn: QN, color: Color = 'red') -> Callable:
+def spy_builtin(qn: QN, color: Color = "red") -> Callable:
     """
     Decorator to make an interp-level function wrappable by the VM.
 
@@ -77,8 +78,10 @@ def spy_builtin(qn: QN, color: Color = 'red') -> Callable:
     instance of SPyBuiltin: among the other things, this ensures that blue
     calls are correctly cached.
     """
+
     def decorator(fn: Callable) -> SPyBuiltin:
         return SPyBuiltin(fn, qn, color)
+
     return decorator
 
 
@@ -95,6 +98,6 @@ class SPyBuiltin:
     def w_functype(self) -> W_FuncType:
         return self._w.w_functype
 
-    def __call__(self, vm: 'SPyVM', *args: W_Object) -> W_Object:
+    def __call__(self, vm: "SPyVM", *args: W_Object) -> W_Object:
         args_w = list(args)
         return vm.call(self._w, args_w)

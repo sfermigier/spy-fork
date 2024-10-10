@@ -17,18 +17,20 @@ class ModuleGen:
     """
     Generate a W_Module, given a ast.Module.
     """
+
     vm: SPyVM
     modname: str
     mod: ast.Module
     scopes: ScopeAnalyzer
 
-    def __init__(self,
-                 vm: SPyVM,
-                 scopes: ScopeAnalyzer,
-                 modname: str,
-                 mod: ast.Module,
-                 file_spy: py.path.local,
-                 ) -> None:
+    def __init__(
+        self,
+        vm: SPyVM,
+        scopes: ScopeAnalyzer,
+        modname: str,
+        mod: ast.Module,
+        file_spy: py.path.local,
+    ) -> None:
         self.vm = vm
         self.scopes = scopes
         self.modname = modname
@@ -40,8 +42,8 @@ class ModuleGen:
         self.vm.register_module(self.w_mod)
         #
         # Synthesize and execute the fake '@module' function to populate the mod
-        w_functype = W_FuncType.parse('def() -> void')
-        qn = QN(modname=self.modname, attr='@module')
+        w_functype = W_FuncType.parse("def() -> void")
+        qn = QN(modname=self.modname, attr="@module")
         modinit_funcdef = self.make_modinit()
         closure = ()
         w_INIT = W_ASTFunc(w_functype, qn, modinit_funcdef, closure)
@@ -54,7 +56,7 @@ class ModuleGen:
                 self.gen_GlobalVarDef(frame, decl)
         #
         # call the __INIT__, if present
-        w_init = self.w_mod.getattr_maybe('__INIT__')
+        w_init = self.w_mod.getattr_maybe("__INIT__")
         if w_init is not None:
             assert isinstance(w_init, W_ASTFunc)
             assert w_init.color == "blue"
@@ -65,18 +67,18 @@ class ModuleGen:
     def make_modinit(self) -> ast.FuncDef:
         loc = Loc(str(self.file_spy), 1, 1, 1, 1)
         return ast.FuncDef(
-            loc = loc,
-            color = 'blue',
-            name = f'@module',
-            args = [],
-            return_type = ast.Name(loc=loc, id='object'),
-            body = [],
-            symtable = self.scopes.by_module(),
+            loc=loc,
+            color="blue",
+            name=f"@module",
+            args=[],
+            return_type=ast.Name(loc=loc, id="object"),
+            body=[],
+            symtable=self.scopes.by_module(),
         )
 
     def gen_FuncDef(self, frame: ASTFrame, funcdef: ast.FuncDef) -> None:
         # sanity check: if it's the global __INIT__, it must be @blue
-        if funcdef.name == '__INIT__' and funcdef.color != 'blue':
+        if funcdef.name == "__INIT__" and funcdef.color != "blue":
             err = SPyTypeError("the __INIT__ function must be @blue")
             err.add("error", "function defined here", funcdef.prototype_loc)
             raise err
@@ -89,8 +91,9 @@ class ModuleGen:
     def gen_GlobalVarDef(self, frame: ASTFrame, decl: ast.GlobalVarDef) -> None:
         vardef = decl.vardef
         assign = decl.assign
-        fqn = self.vm.get_FQN(QN(modname=self.modname, attr=vardef.name),
-                              is_global=True)
+        fqn = self.vm.get_FQN(
+            QN(modname=self.modname, attr=vardef.name), is_global=True
+        )
         if isinstance(vardef.type, ast.Auto):
             # type inference
             w_val = frame.eval_expr(assign.value)

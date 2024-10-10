@@ -7,11 +7,13 @@ from spy.vm.modules.rawbuffer import RB
 from spy.vm.modules.types import W_TypeDef
 from spy.vm.modules.jsffi import JSFFI
 
+
 @dataclass
 class C_Type:
     """
     Just a tiny wrapper around a string, but it helps to make things tidy.
     """
+
     name: str
 
     def __repr__(self) -> str:
@@ -19,6 +21,7 @@ class C_Type:
 
     def __str__(self) -> str:
         return self.name
+
 
 @dataclass
 class C_FuncParam:
@@ -37,12 +40,12 @@ class C_Function:
 
     def decl(self) -> str:
         if self.params == []:
-            s_params = 'void'
+            s_params = "void"
         else:
-            paramlist = [f'{p.c_type} {p.name}' for p in self.params]
-            s_params = ', '.join(paramlist)
+            paramlist = [f"{p.c_type} {p.name}" for p in self.params]
+            s_params = ", ".join(paramlist)
         #
-        return f'{self.c_restype} {self.name}({s_params})'
+        return f"{self.c_restype} {self.name}({s_params})"
 
 
 class Context:
@@ -51,26 +54,27 @@ class Context:
 
     Keep track of things like the mapping from W_* types to C types.
     """
+
     vm: SPyVM
     _d: dict[W_Type, C_Type]
 
     def __init__(self, vm: SPyVM) -> None:
         self.vm = vm
         self._d = {}
-        self._d[B.w_void] = C_Type('void')
-        self._d[B.w_i32] = C_Type('int32_t')
-        self._d[B.w_f64] = C_Type('double')
-        self._d[B.w_bool] = C_Type('bool')
-        self._d[B.w_str] = C_Type('spy_Str *')
-        self._d[RB.w_RawBuffer] = C_Type('spy_RawBuffer *')
-        self._d[JSFFI.w_JsRef] = C_Type('JsRef')
+        self._d[B.w_void] = C_Type("void")
+        self._d[B.w_i32] = C_Type("int32_t")
+        self._d[B.w_f64] = C_Type("double")
+        self._d[B.w_bool] = C_Type("bool")
+        self._d[B.w_str] = C_Type("spy_Str *")
+        self._d[RB.w_RawBuffer] = C_Type("spy_RawBuffer *")
+        self._d[JSFFI.w_JsRef] = C_Type("JsRef")
 
     def w2c(self, w_type: W_Type) -> C_Type:
         if isinstance(w_type, W_TypeDef):
             w_type = w_type.w_origintype
         if w_type in self._d:
             return self._d[w_type]
-        raise NotImplementedError(f'Cannot translate type {w_type} to C')
+        raise NotImplementedError(f"Cannot translate type {w_type} to C")
 
     def c_function(self, name: str, w_functype: W_FuncType) -> C_Function:
         c_restype = self.w2c(w_functype.w_restype)

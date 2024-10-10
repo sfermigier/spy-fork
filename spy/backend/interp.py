@@ -9,6 +9,7 @@ The SPy code is interpreted by the SPy VM.
 Python objects are automatically converted into their SPy equivalent and
 vice-versa, by using vm.wrap and vm.unwrap.
 """
+
 from typing import Any
 from spy.vm.vm import SPyVM
 from spy.vm.module import W_Module
@@ -19,6 +20,7 @@ class InterpModuleWrapper:
     """
     Wrap a W_Module.
     """
+
     vm: SPyVM
     w_mod: W_Module
 
@@ -40,6 +42,7 @@ class InterpFuncWrapper:
     """
     Wrap a W_Func.
     """
+
     vm: SPyVM
     w_func: W_Func
     w_functype: W_FuncType

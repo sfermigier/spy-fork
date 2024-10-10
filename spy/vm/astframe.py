@@ -4,8 +4,13 @@ from dataclasses import dataclass
 from spy import ast
 from spy.fqn import FQN, QN
 from spy.location import Loc
-from spy.errors import (SPyRuntimeAbort, SPyTypeError, SPyNameError,
-                        SPyRuntimeError, maybe_plural)
+from spy.errors import (
+    SPyRuntimeAbort,
+    SPyTypeError,
+    SPyNameError,
+    SPyRuntimeError,
+    maybe_plural,
+)
 from spy.irgen.symtable import Symbol, Color
 from spy.vm.b import B
 from spy.vm.object import W_Object, W_Type
@@ -15,8 +20,10 @@ from spy.vm.tuple import W_Tuple
 from spy.vm.typechecker import TypeChecker
 from spy.vm.typeconverter import TypeConverter
 from spy.util import magic_dispatch
+
 if TYPE_CHECKING:
     from spy.vm.vm import SPyVM
+
 
 class Return(Exception):
     w_value: W_Object
@@ -26,13 +33,13 @@ class Return(Exception):
 
 
 class ASTFrame:
-    vm: 'SPyVM'
+    vm: "SPyVM"
     w_func: W_ASTFunc
     funcdef: ast.FuncDef
     _locals: Namespace
     t: TypeChecker
 
-    def __init__(self, vm: 'SPyVM', w_func: W_ASTFunc) -> None:
+    def __init__(self, vm: "SPyVM", w_func: W_ASTFunc) -> None:
         assert isinstance(w_func, W_ASTFunc)
         self.vm = vm
         self.w_func = w_func
@@ -41,7 +48,7 @@ class ASTFrame:
         self.t = TypeChecker(vm, self.w_func)
 
     def __repr__(self) -> str:
-        return f'<ASTFrame for {self.w_func.qn}>'
+        return f"<ASTFrame for {self.w_func.qn}>"
 
     def store_local(self, name: str, w_value: W_Object) -> None:
         self._locals[name] = w_value
@@ -49,7 +56,7 @@ class ASTFrame:
     def load_local(self, name: str) -> W_Object:
         w_obj = self._locals.get(name)
         if w_obj is None:
-            raise SPyRuntimeError('read from uninitialized local')
+            raise SPyRuntimeError("read from uninitialized local")
         return w_obj
 
     def run(self, args_w: list[W_Object]) -> W_Object:
@@ -64,8 +71,8 @@ class ASTFrame:
                 return B.w_None
             else:
                 loc = self.w_func.funcdef.loc.make_end_loc()
-                msg = 'reached the end of the function without a `return`'
-                raise SPyTypeError.simple(msg, 'no return', loc)
+                msg = "reached the end of the function without a `return`"
+                raise SPyTypeError.simple(msg, "no return", loc)
 
         except Return as e:
             return e.w_value
@@ -86,12 +93,12 @@ class ASTFrame:
 
     def exec_stmt(self, stmt: ast.Stmt) -> None:
         self.t.check_stmt(stmt)
-        return magic_dispatch(self, 'exec_stmt', stmt)
+        return magic_dispatch(self, "exec_stmt", stmt)
 
     def eval_expr(self, expr: ast.Expr) -> W_Object:
         self.t.check_expr(expr)
         typeconv = self.t.expr_conv.get(expr)
-        w_val = magic_dispatch(self, 'eval_expr', expr)
+        w_val = magic_dispatch(self, "eval_expr", expr)
         if typeconv is None:
             return w_val
         else:
@@ -103,7 +110,7 @@ class ASTFrame:
         if isinstance(w_val, W_Type):
             return w_val
         w_valtype = self.vm.dynamic_type(w_val)
-        msg = f'expected `type`, got `{w_valtype.name}`'
+        msg = f"expected `type`, got `{w_valtype.name}`"
         raise SPyTypeError.simple(msg, "expected `type`", expr.loc)
 
     # ==== statements ====
@@ -118,14 +125,11 @@ class ASTFrame:
         for arg in funcdef.args:
             d[arg.name] = self.eval_expr_type(arg.type)
         w_restype = self.eval_expr_type(funcdef.return_type)
-        w_functype = W_FuncType.make(
-            color = funcdef.color,
-            w_restype = w_restype,
-            **d)
+        w_functype = W_FuncType.make(color=funcdef.color, w_restype=w_restype, **d)
         self.t.lazy_check_FuncDef(funcdef, w_functype)
         #
         # create the w_func
-        modname = self.w_func.qn.modname # the module of the "outer" function
+        modname = self.w_func.qn.modname  # the module of the "outer" function
         qn = QN(modname=modname, attr=funcdef.name)
         # XXX we should capture only the names actually used in the inner func
         closure = self.w_func.closure + (self._locals,)
@@ -160,11 +164,10 @@ class ASTFrame:
         if sym.is_local:
             self.store_local(target, w_val)
         elif sym.fqn is not None:
-            assert sym.color == 'red'
+            assert sym.color == "red"
             self.vm.store_global(sym.fqn, w_val)
         else:
-            assert False, 'closures not implemented yet'
-
+            assert False, "closures not implemented yet"
 
     def exec_stmt_SetAttr(self, node: ast.SetAttr) -> None:
         w_opimpl = self.t.opimpl[node]
@@ -218,8 +221,9 @@ class ASTFrame:
         sym = self.w_func.funcdef.symtable.lookup(name.id)
         if sym.fqn is not None:
             w_value = self.vm.lookup_global(sym.fqn)
-            assert w_value is not None, \
-                f'{sym.fqn} not found. Bug in the ScopeAnalyzer?'
+            assert (
+                w_value is not None
+            ), f"{sym.fqn} not found. Bug in the ScopeAnalyzer?"
             return w_value
         elif sym.is_local:
             return self.load_local(name.id)
@@ -231,7 +235,7 @@ class ASTFrame:
 
     def eval_expr_BinOp(self, binop: ast.BinOp) -> W_Object:
         w_opimpl = self.t.opimpl[binop]
-        assert w_opimpl, 'bug in the typechecker'
+        assert w_opimpl, "bug in the typechecker"
         w_l = self.eval_expr(binop.left)
         w_r = self.eval_expr(binop.right)
         w_res = w_opimpl.call(self.vm, [w_l, w_r])
@@ -260,13 +264,13 @@ class ASTFrame:
 
         if w_opimpl.is_direct_call():
             # some extra sanity checks
-            assert color == 'blue', 'indirect calls not supported'
+            assert color == "blue", "indirect calls not supported"
             if w_functype is B.w_dynamic:
                 # if the static type is `dynamic` and thing is not a function,
                 # it's a TypeError
                 if not isinstance(w_func, W_Func):
                     t = self.vm.dynamic_type(w_func)
-                    raise SPyTypeError(f'cannot call objects of type `{t.name}`')
+                    raise SPyTypeError(f"cannot call objects of type `{t.name}`")
             else:
                 # if the static type is not `dynamic` and the thing is not a
                 # function, it's a bug in the typechecker
@@ -281,9 +285,9 @@ class ASTFrame:
         if isinstance(arg, ast.Name):
             _, w_argtype = self.t.check_expr(arg)
             return w_argtype
-        msg = 'STATIC_TYPE works only on simple expressions'
+        msg = "STATIC_TYPE works only on simple expressions"
         OP = arg.__class__.__name__
-        raise SPyTypeError.simple(msg, f'{OP} not allowed here', arg.loc)
+        raise SPyTypeError.simple(msg, f"{OP} not allowed here", arg.loc)
 
     def eval_expr_CallMethod(self, op: ast.CallMethod) -> W_Object:
         w_opimpl = self.t.opimpl[op]
@@ -314,7 +318,7 @@ class ASTFrame:
         color, w_listtype = self.t.check_expr(op)
         items_w = [self.eval_expr(item) for item in op.items]
         assert issubclass(w_listtype.pyclass, W_List)
-        return w_listtype.pyclass(items_w) # type: ignore
+        return w_listtype.pyclass(items_w)  # type: ignore
 
     def eval_expr_Tuple(self, op: ast.Tuple) -> W_Object:
         color, w_tupletype = self.t.check_expr(op)

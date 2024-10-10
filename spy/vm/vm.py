@@ -24,6 +24,7 @@ from spy.vm.modules.types import TYPES, W_TypeDef
 from spy.vm.modules.rawbuffer import RAW_BUFFER
 from spy.vm.modules.jsffi import JSFFI
 
+
 class SPyVM:
     """
     A Virtual Machine to execute SPy code.
@@ -31,6 +32,7 @@ class SPyVM:
     Each instance of the VM contains an instance of libspy.wasm: all the
     non-scalar objects (e.g. strings) are stored in the WASM linear memory.
     """
+
     ll: libspy.LLSPyInstance
     globals_types: dict[FQN, W_Type]
     globals_w: dict[FQN, W_Object]
@@ -47,21 +49,22 @@ class SPyVM:
         self.unique_fqns = set()
         self.path = []
         self.bluecache = BlueCache(self)
-        self.make_module(BUILTINS)   # builtins::
-        self.make_module(OPERATOR)   # operator::
-        self.make_module(TYPES)      # types::
-        self.make_module(RAW_BUFFER) # rawbuffer::
-        self.make_module(JSFFI)      # jsffi::
+        self.make_module(BUILTINS)  # builtins::
+        self.make_module(OPERATOR)  # operator::
+        self.make_module(TYPES)  # types::
+        self.make_module(RAW_BUFFER)  # rawbuffer::
+        self.make_module(JSFFI)  # jsffi::
 
     def import_(self, modname: str) -> W_Module:
         from spy.irgen.irgen import make_w_mod_from_file
+
         if modname in self.modules_w:
             return self.modules_w[modname]
         # XXX for now we assume that we find the module as a single file in
         # the only vm.path entry. Eventually we will need a proper import
         # mechanism and support for packages
-        assert self.path, 'vm.path not set'
-        file_spy = py.path.local(self.path[0]).join(f'{modname}.spy')
+        assert self.path, "vm.path not set"
+        file_spy = py.path.local(self.path[0]).join(f"{modname}.spy")
         w_mod = make_w_mod_from_file(self, file_spy)
         self.modules_w[modname] = w_mod
         return w_mod
@@ -70,9 +73,10 @@ class SPyVM:
         """
         Perform a redshift on all W_ASTFunc.
         """
+
         def should_redshift(w_func: W_ASTFunc) -> bool:
             # we don't want to redshift @blue functions
-            return w_func.color != 'blue' and not w_func.redshifted
+            return w_func.color != "blue" and not w_func.redshifted
 
         def get_funcs() -> Iterable[tuple[FQN, W_ASTFunc]]:
             for fqn, w_func in self.globals_w.items():
@@ -87,7 +91,7 @@ class SPyVM:
 
     def _redshift_some(self, funcs: list[tuple[FQN, W_ASTFunc]]) -> None:
         for fqn, w_func in funcs:
-            assert w_func.color != 'blue'
+            assert w_func.color != "blue"
             assert not w_func.redshifted
             w_newfunc = redshift(self, w_func)
             assert w_newfunc.redshifted
@@ -129,11 +133,7 @@ class SPyVM:
         self.unique_fqns.add(fqn)
         return fqn
 
-    def add_global(self,
-                   fqn: FQN,
-                   w_type: Optional[W_Type],
-                   w_value: W_Object
-                   ) -> None:
+    def add_global(self, fqn: FQN, w_type: Optional[W_Type], w_value: W_Object) -> None:
         assert isinstance(fqn, FQN)
         assert fqn.modname in self.modules_w
         assert fqn not in self.globals_w
@@ -265,9 +265,11 @@ class SPyVM:
         elif isinstance(value, FunctionType):
             raise Exception(
                 f"Cannot wrap interp-level function {value.__name__}. "
-                f"Did you forget `@spy_builtin`?")
-        raise Exception(f"Cannot wrap interp-level objects " +
-                        f"of type {value.__class__.__name__}")
+                f"Did you forget `@spy_builtin`?"
+            )
+        raise Exception(
+            f"Cannot wrap interp-level objects " + f"of type {value.__class__.__name__}"
+        )
 
     def wrap_func(self, value: Any) -> W_Func:
         w_func = self.wrap(value)
@@ -285,21 +287,21 @@ class SPyVM:
 
     def unwrap_i32(self, w_value: W_Object) -> Any:
         if not isinstance(w_value, W_I32):
-            raise Exception('Type mismatch')
+            raise Exception("Type mismatch")
         return w_value.value
 
     def unwrap_f64(self, w_value: W_Object) -> Any:
         if not isinstance(w_value, W_F64):
-            raise Exception('Type mismatch')
+            raise Exception("Type mismatch")
         return w_value.value
 
     def unwrap_str(self, w_value: W_Object) -> str:
         if not isinstance(w_value, W_Str):
-            raise Exception('Type mismatch')
-        return self.unwrap(w_value) # type: ignore
+            raise Exception("Type mismatch")
+        return self.unwrap(w_value)  # type: ignore
 
     def call(self, w_func: W_Func, args_w: list[W_Object]) -> W_Object:
-        if w_func.color == 'blue':
+        if w_func.color == "blue":
             # for blue functions, we memoize the result
             w_result = self.bluecache.lookup(w_func, args_w)
             if w_result is not None:
@@ -329,16 +331,16 @@ class SPyVM:
         return w_func.spy_call(self, args_w)
 
     def eq(self, w_a: W_Dynamic, w_b: W_Dynamic) -> W_Bool:
-        wv_a = W_Value('a', 0, self.dynamic_type(w_a), None)
-        wv_b = W_Value('b', 1, self.dynamic_type(w_b), None)
+        wv_a = W_Value("a", 0, self.dynamic_type(w_a), None)
+        wv_b = W_Value("b", 1, self.dynamic_type(w_b), None)
         w_opimpl = self.call_OP(OPERATOR.w_EQ, [wv_a, wv_b])
         w_res = w_opimpl.call(self, [w_a, w_b])
         assert isinstance(w_res, W_Bool)
         return w_res
 
     def ne(self, w_a: W_Dynamic, w_b: W_Dynamic) -> W_Bool:
-        wv_a = W_Value('a', 0, self.dynamic_type(w_a), None)
-        wv_b = W_Value('b', 1, self.dynamic_type(w_b), None)
+        wv_a = W_Value("a", 0, self.dynamic_type(w_a), None)
+        wv_b = W_Value("b", 1, self.dynamic_type(w_b), None)
         w_opimpl = self.call_OP(OPERATOR.w_NE, [wv_a, wv_b])
         w_res = w_opimpl.call(self, [w_a, w_b])
         assert isinstance(w_res, W_Bool)
@@ -348,8 +350,8 @@ class SPyVM:
         # FIXME: we need a more structured way of implementing operators
         # inside the vm, and possibly share the code with typechecker and
         # ASTFrame. See also vm.ne and vm.getitem
-        wv_obj = W_Value('obj', 0, self.dynamic_type(w_obj), None)
-        wv_i = W_Value('i', 1, self.dynamic_type(w_i), None)
+        wv_obj = W_Value("obj", 0, self.dynamic_type(w_obj), None)
+        wv_i = W_Value("i", 1, self.dynamic_type(w_i), None)
         w_opimpl = self.call_OP(OPERATOR.w_GETITEM, [wv_obj, wv_i])
         return w_opimpl.call(self, [w_obj, w_i])
 
@@ -399,8 +401,8 @@ class SPyVM:
         if isinstance(w_a, W_Value) and isinstance(w_b, W_Value):
             return value_eq(self, w_a, w_b)
 
-        wv_a = W_Value('a', 0, self.dynamic_type(w_a), None)
-        wv_b = W_Value('b', 1, self.dynamic_type(w_b), None)
+        wv_a = W_Value("a", 0, self.dynamic_type(w_a), None)
+        wv_b = W_Value("b", 1, self.dynamic_type(w_b), None)
         try:
             w_opimpl = self.call_OP(OPERATOR.w_EQ, [wv_a, wv_b])
         except SPyTypeError:
@@ -408,7 +410,7 @@ class SPyVM:
             # be possible. If it's not, it means that we forgot to implement it
             w_ta = wv_a.w_static_type
             w_tb = wv_b.w_static_type
-            assert w_ta is not w_tb, f'EQ missing on type `{w_ta.name}`'
+            assert w_ta is not w_tb, f"EQ missing on type `{w_ta.name}`"
             return B.w_False
 
         w_res = w_opimpl.call(self, [w_a, w_b])

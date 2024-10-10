@@ -35,24 +35,26 @@ See also SPyVM.get_FQN().
 
 from typing import Optional, Any
 
+
 class QN:
     modname: str
     attr: str
 
-    def __init__(self,
-                 fullname: Optional[str] = None,
-                 *,
-                 modname: Optional[str] = None,
-                 attr: Optional[str] = None,
-                 ) -> None:
+    def __init__(
+        self,
+        fullname: Optional[str] = None,
+        *,
+        modname: Optional[str] = None,
+        attr: Optional[str] = None,
+    ) -> None:
         if fullname is None:
             assert modname is not None
             assert attr is not None
         else:
             assert modname is None
             assert attr is None
-            assert fullname.count('::') == 1
-            modname, attr = fullname.split('::')
+            assert fullname.count("::") == 1
+            modname, attr = fullname.split("::")
         #
         self.modname = modname
         self.attr = attr
@@ -73,7 +75,7 @@ class QN:
 
     @property
     def fullname(self) -> str:
-        return f'{self.modname}::{self.attr}'
+        return f"{self.modname}::{self.attr}"
 
 
 class FQN:
@@ -82,11 +84,12 @@ class FQN:
     suffix: str
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
-        raise ValueError("You cannot instantiate an FQN directly. "
-                         "Please use vm.get_FQN()")
+        raise ValueError(
+            "You cannot instantiate an FQN directly. " "Please use vm.get_FQN()"
+        )
 
     @classmethod
-    def make(cls, modname: str, attr: str, suffix: str) -> 'FQN':
+    def make(cls, modname: str, attr: str, suffix: str) -> "FQN":
         obj = cls.__new__(cls)
         obj.modname = modname
         obj.attr = attr
@@ -94,7 +97,7 @@ class FQN:
         return obj
 
     @classmethod
-    def make_global(cls, modname: str, attr: str) -> 'FQN':
+    def make_global(cls, modname: str, attr: str) -> "FQN":
         """
         Return the FQN corresponding to a global name.
 
@@ -104,23 +107,23 @@ class FQN:
         return cls.make(modname, attr, suffix="")
 
     @classmethod
-    def parse(cls, s: str) -> 'FQN':
-        if '#' in s:
-            assert s.count('#') == 1
-            qn, suffix = s.split('#')
+    def parse(cls, s: str) -> "FQN":
+        if "#" in s:
+            assert s.count("#") == 1
+            qn, suffix = s.split("#")
         else:
             qn = s
             suffix = ""
         #
-        assert qn.count('::') == 1
-        modname, attr = qn.split('::')
+        assert qn.count("::") == 1
+        modname, attr = qn.split("::")
         return FQN.make(modname=modname, attr=attr, suffix=suffix)
 
     @property
     def fullname(self) -> str:
-        s = f'{self.modname}::{self.attr}'
-        if self.suffix != '':
-            s += '#' + self.suffix
+        s = f"{self.modname}::{self.attr}"
+        if self.suffix != "":
+            s += "#" + self.suffix
         return s
 
     def __repr__(self) -> str:
@@ -160,15 +163,15 @@ class FQN:
         Becomes:
             spy_a_b_c$foo
         """
-        modname = self.modname.replace('.', '_')
-        cn = f'spy_{modname}${self.attr}'
-        if self.suffix != '':
-            cn += '$' + self.suffix
+        modname = self.modname.replace(".", "_")
+        cn = f"spy_{modname}${self.attr}"
+        if self.suffix != "":
+            cn += "$" + self.suffix
         return cn
 
     @property
     def spy_name(self) -> str:
-        return f'{self.modname}.{self.attr}'
+        return f"{self.modname}.{self.attr}"
 
     def is_module(self) -> bool:
         return self.attr == ""

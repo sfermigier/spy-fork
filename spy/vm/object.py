@@ -46,9 +46,9 @@ basically a thin wrapper around the correspindig interp-level W_* class.
 
 import fixedint
 import typing
-from typing import (TYPE_CHECKING, ClassVar, Type, Any, Annotated, Optional,
-                    Union)
+from typing import TYPE_CHECKING, ClassVar, Type, Any, Annotated, Optional, Union
 from spy.fqn import QN
+
 if TYPE_CHECKING:
     from spy.vm.vm import SPyVM
     from spy.vm.str import W_Str
@@ -57,36 +57,38 @@ if TYPE_CHECKING:
 # Basic setup of the object model: <object> and <type>
 # =====================================================
 
+
 class W_Object:
     """
     The root of SPy object hierarchy
     """
 
-    _w: ClassVar['W_Type']                         # set later by @spytype
-    __spy_members__: ClassVar['dict[str, Member]'] # set later by @spytype
+    _w: ClassVar["W_Type"]  # set later by @spytype
+    __spy_members__: ClassVar["dict[str, Member]"]  # set later by @spytype
 
     # Storage category:
     #   - 'value': compares by value, don't have an identity, 'is' is
     #     forbidden. E.g., i32, f64, str.
     #   - 'reference': compare by identity
-    __spy_storage_category__ = 'value'
+    __spy_storage_category__ = "value"
 
     def __repr__(self) -> str:
         typename = self._w.name
-        addr = f'0x{id(self):x}'
-        return f'<spy instance: type={typename}, id={addr}>'
+        addr = f"0x{id(self):x}"
+        return f"<spy instance: type={typename}, id={addr}>"
 
-    def spy_get_w_type(self, vm: 'SPyVM') -> 'W_Type':
+    def spy_get_w_type(self, vm: "SPyVM") -> "W_Type":
         pyclass = type(self)
         assert pyclass._w is not None
         return pyclass._w
 
-    def spy_unwrap(self, vm: 'SPyVM') -> Any:
+    def spy_unwrap(self, vm: "SPyVM") -> Any:
         spy_type = vm.dynamic_type(self).name
         py_type = self.__class__.__name__
-        raise Exception(f"Cannot unwrap app-level objects of type {spy_type} "
-                        f"(inter-level type: {py_type})")
-
+        raise Exception(
+            f"Cannot unwrap app-level objects of type {spy_type} "
+            f"(inter-level type: {py_type})"
+        )
 
     # ==== OPERATOR SUPPORT ====
     #
@@ -132,44 +134,44 @@ class W_Object:
         default_meth = getattr(W_Object, name, None)
         meth = getattr(cls, name, None)
         if default_meth is None or meth is None:
-            raise ValueError(f'Invalid method name: {name}')
+            raise ValueError(f"Invalid method name: {name}")
         if default_meth is meth:
             return False
         return True
 
     @staticmethod
-    def op_EQ(vm: 'SPyVM', wv_a: 'W_Value', wv_b: 'W_Value') -> 'W_OpImpl':
-        raise NotImplementedError('this should never be called')
+    def op_EQ(vm: "SPyVM", wv_a: "W_Value", wv_b: "W_Value") -> "W_OpImpl":
+        raise NotImplementedError("this should never be called")
 
     @staticmethod
-    def op_GETATTR(vm: 'SPyVM', wv_obj: 'W_Value',
-                   wv_attr: 'W_Value') -> 'W_OpImpl':
-        raise NotImplementedError('this should never be called')
+    def op_GETATTR(vm: "SPyVM", wv_obj: "W_Value", wv_attr: "W_Value") -> "W_OpImpl":
+        raise NotImplementedError("this should never be called")
 
     @staticmethod
-    def op_SETATTR(vm: 'SPyVM', wv_obj: 'W_Value', wv_attr: 'W_Value',
-                   wv_v: 'W_Value') -> 'W_OpImpl':
-        raise NotImplementedError('this should never be called')
+    def op_SETATTR(
+        vm: "SPyVM", wv_obj: "W_Value", wv_attr: "W_Value", wv_v: "W_Value"
+    ) -> "W_OpImpl":
+        raise NotImplementedError("this should never be called")
 
     @staticmethod
-    def op_GETITEM(vm: 'SPyVM', wv_obj: 'W_Value',
-                   wv_i: 'W_Value') -> 'W_OpImpl':
-        raise NotImplementedError('this should never be called')
+    def op_GETITEM(vm: "SPyVM", wv_obj: "W_Value", wv_i: "W_Value") -> "W_OpImpl":
+        raise NotImplementedError("this should never be called")
 
     @staticmethod
-    def op_SETITEM(vm: 'SPyVM', wv_obj: 'W_Value', wv_i: 'W_Value',
-                   wv_v: 'W_Value') -> 'W_OpImpl':
-        raise NotImplementedError('this should never be called')
+    def op_SETITEM(
+        vm: "SPyVM", wv_obj: "W_Value", wv_i: "W_Value", wv_v: "W_Value"
+    ) -> "W_OpImpl":
+        raise NotImplementedError("this should never be called")
 
     @staticmethod
-    def op_CALL(vm: 'SPyVM', wv_obj: 'W_Value',
-                w_values: 'W_Dynamic') -> 'W_OpImpl':
-        raise NotImplementedError('this should never be called')
+    def op_CALL(vm: "SPyVM", wv_obj: "W_Value", w_values: "W_Dynamic") -> "W_OpImpl":
+        raise NotImplementedError("this should never be called")
 
     @staticmethod
-    def op_CALL_METHOD(vm: 'SPyVM', wv_obj: 'W_Value', wv_method: 'W_Value',
-                       w_values: 'W_Dynamic') -> 'W_OpImpl':
-        raise NotImplementedError('this should never be called')
+    def op_CALL_METHOD(
+        vm: "SPyVM", wv_obj: "W_Value", wv_method: "W_Value", w_values: "W_Dynamic"
+    ) -> "W_OpImpl":
+        raise NotImplementedError("this should never be called")
 
 
 class W_Type(W_Object):
@@ -181,7 +183,7 @@ class W_Type(W_Object):
 
     name: str
     pyclass: Type[W_Object]
-    __spy_storage_category__ = 'reference'
+    __spy_storage_category__ = "reference"
 
     def __init__(self, name: str, pyclass: Type[W_Object]):
         assert issubclass(pyclass, W_Object)
@@ -190,7 +192,7 @@ class W_Type(W_Object):
 
     # Union[W_Type, W_Void] means "either a W_Type or B.w_None"
     @property
-    def w_base(self) -> Union['W_Type', 'W_Void']:
+    def w_base(self) -> Union["W_Type", "W_Void"]:
         if self is W_Object._w or self is w_DynamicType:
             return W_Void._w_singleton  # this is B.w_None
         basecls = self.pyclass.__base__
@@ -201,15 +203,16 @@ class W_Type(W_Object):
     def __repr__(self) -> str:
         return f"<spy type '{self.name}'>"
 
-    def spy_unwrap(self, vm: 'SPyVM') -> Type[W_Object]:
+    def spy_unwrap(self, vm: "SPyVM") -> Type[W_Object]:
         return self.pyclass
 
-    def is_reference_type(self, vm: 'SPyVM') -> bool:
-        return self.pyclass.__spy_storage_category__ == 'reference'
+    def is_reference_type(self, vm: "SPyVM") -> bool:
+        return self.pyclass.__spy_storage_category__ == "reference"
 
-W_Object._w = W_Type('object', W_Object)
+
+W_Object._w = W_Type("object", W_Object)
 W_Object.__spy_members__ = {}
-W_Type._w = W_Type('type', W_Type)
+W_Type._w = W_Type("type", W_Type)
 W_Type.__spy_members__ = {}
 
 # The <dynamic> type
@@ -247,12 +250,13 @@ W_Type.__spy_members__ = {}
 # it's equivalent to W_Object, but it is recognized by @spy_builtin to
 # generate the "correct" w_functype signature.
 
-w_DynamicType = W_Type('dynamic', W_Object) # this is B.w_dynamic
-W_Dynamic = Annotated[W_Object, 'W_Dynamic']
+w_DynamicType = W_Type("dynamic", W_Object)  # this is B.w_dynamic
+W_Dynamic = Annotated[W_Object, "W_Dynamic"]
 
 
 # Other types
 # ============
+
 
 class Member:
     """
@@ -265,8 +269,9 @@ class Member:
     This will add an app-level attribute "x" to the class, corresponding to
     the interp-level attribute "w_x".
     """
+
     name: str
-    field: str      # set later by @spytype
+    field: str  # set later by @spytype
     w_type: W_Type  # set later by @spytype
 
     def __init__(self, name: str) -> None:
@@ -277,7 +282,7 @@ def _get_member_maybe(t: Any) -> Optional[Member]:
     """
     Return the Member instance found in the annotation metadata, if any.
     """
-    for meta in getattr(t, '__metadata__', []):
+    for meta in getattr(t, "__metadata__", []):
         if isinstance(meta, Member):
             return meta
     return None
@@ -314,22 +319,23 @@ def make_metaclass(name: str, pyclass: Type[W_Object]) -> Type[W_Type]:
     2. by using `spy_new`, which automatically synthesize an appropriare
        op_meta_CALL. This is just for convenience.
     """
-    metaname = f'Meta_{name}'
+    metaname = f"Meta_{name}"
 
     class W_MetaType(W_Type):
-        __name__ = f'W_{metaname}'
+        __name__ = f"W_{metaname}"
         __qualname__ = __name__
 
-    if hasattr(pyclass, 'meta_op_CALL'):
+    if hasattr(pyclass, "meta_op_CALL"):
         W_MetaType.op_CALL = pyclass.meta_op_CALL  # type: ignore
-    elif hasattr(pyclass, 'spy_new'):
+    elif hasattr(pyclass, "spy_new"):
         W_MetaType.op_CALL = synthesize_meta_op_CALL(pyclass)  # type: ignore
 
-    if hasattr(pyclass, 'meta_op_GETITEM'):
+    if hasattr(pyclass, "meta_op_GETITEM"):
         W_MetaType.op_GETITEM = pyclass.meta_op_GETITEM  # type: ignore
 
     W_MetaType._w = W_Type(metaname, W_MetaType)
     return W_MetaType
+
 
 def fix_annotations(fn: Any, types: dict[str, type]) -> None:
     """
@@ -340,6 +346,7 @@ def fix_annotations(fn: Any, types: dict[str, type]) -> None:
         if isinstance(T, str) and T in types:
             newT = types[T]
             fn.__annotations__[key] = newT
+
 
 def synthesize_meta_op_CALL(pyclass: Type[W_Object]) -> Any:
     """
@@ -372,18 +379,19 @@ def synthesize_meta_op_CALL(pyclass: Type[W_Object]) -> Any:
     """
     from spy.vm.opimpl import W_OpImpl, W_Value
     from spy.vm.sig import spy_builtin
-    assert hasattr(pyclass, 'spy_new')
+
+    assert hasattr(pyclass, "spy_new")
     spy_new = pyclass.spy_new
 
-    def meta_op_CALL(vm: 'SPyVM', wv_obj: W_Value,
-                     w_values: W_Dynamic) -> W_OpImpl:
+    def meta_op_CALL(vm: "SPyVM", wv_obj: W_Value, w_values: W_Dynamic) -> W_OpImpl:
         fix_annotations(spy_new, {pyclass.__name__: pyclass})
-        qn = QN(modname='ext', attr='new') # XXX what modname should we use?
+        qn = QN(modname="ext", attr="new")  # XXX what modname should we use?
         # manually apply the @spy_builtin decorator to the spy_new function
         spyfunc = spy_builtin(qn)(spy_new)
         return W_OpImpl.simple(vm.wrap_func(spyfunc))
 
     return meta_op_CALL
+
 
 def spytype(name: str) -> Any:
     """
@@ -392,6 +400,7 @@ def spytype(name: str) -> Any:
     Given a W_* class, it automatically creates the corresponding instance of
     W_Type and attaches it to the W_* class.
     """
+
     def decorator(pyclass: Type[W_Object]) -> Type[W_Object]:
         W_MetaClass = make_metaclass(name, pyclass)
 
@@ -406,9 +415,11 @@ def spytype(name: str) -> Any:
                 pyclass.__spy_members__[member.name] = member
 
         return pyclass
+
     return decorator
 
-@spytype('void')
+
+@spytype("void")
 class W_Void(W_Object):
     """
     Equivalent of Python's NoneType.
@@ -417,7 +428,7 @@ class W_Void(W_Object):
     which is w_None.
     """
 
-    _w_singleton: ClassVar['W_Void']
+    _w_singleton: ClassVar["W_Void"]
 
     def __init__(self) -> None:
         # this is just a sanity check: we don't want people to be able to
@@ -425,15 +436,16 @@ class W_Void(W_Object):
         raise Exception("You cannot instantiate W_Void")
 
     def __repr__(self) -> str:
-        return '<spy None>'
+        return "<spy None>"
 
-    def spy_unwrap(self, vm: 'SPyVM') -> None:
+    def spy_unwrap(self, vm: "SPyVM") -> None:
         return None
+
 
 W_Void._w_singleton = W_Void.__new__(W_Void)
 
 
-@spytype('i32')
+@spytype("i32")
 class W_I32(W_Object):
     value: fixedint.Int32
 
@@ -442,13 +454,13 @@ class W_I32(W_Object):
         self.value = fixedint.Int32(value)
 
     def __repr__(self) -> str:
-        return f'W_I32({self.value})'
+        return f"W_I32({self.value})"
 
-    def spy_unwrap(self, vm: 'SPyVM') -> fixedint.Int32:
+    def spy_unwrap(self, vm: "SPyVM") -> fixedint.Int32:
         return self.value
 
 
-@spytype('f64')
+@spytype("f64")
 class W_F64(W_Object):
     value: float
 
@@ -457,18 +469,18 @@ class W_F64(W_Object):
         self.value = value
 
     def __repr__(self) -> str:
-        return f'W_F64({self.value})'
+        return f"W_F64({self.value})"
 
-    def spy_unwrap(self, vm: 'SPyVM') -> float:
+    def spy_unwrap(self, vm: "SPyVM") -> float:
         return self.value
 
 
-@spytype('bool')
+@spytype("bool")
 class W_Bool(W_Object):
     value: bool
     #
-    _w_singleton_True: ClassVar['W_Bool']
-    _w_singleton_False: ClassVar['W_Bool']
+    _w_singleton_True: ClassVar["W_Bool"]
+    _w_singleton_False: ClassVar["W_Bool"]
 
     def __init__(self, value: bool) -> None:
         # this is just a sanity check: we don't want people to be able to
@@ -476,30 +488,31 @@ class W_Bool(W_Object):
         raise Exception("You cannot instantiate W_Bool. Use vm.wrap().")
 
     @staticmethod
-    def _make_singleton(value: bool) -> 'W_Bool':
+    def _make_singleton(value: bool) -> "W_Bool":
         w_obj = W_Bool.__new__(W_Bool)
         w_obj.value = value
         return w_obj
 
     def __repr__(self) -> str:
-        return f'W_Bool({self.value})'
+        return f"W_Bool({self.value})"
 
-    def spy_unwrap(self, vm: 'SPyVM') -> bool:
+    def spy_unwrap(self, vm: "SPyVM") -> bool:
         return self.value
 
-    def not_(self, vm: 'SPyVM') -> 'W_Bool':
+    def not_(self, vm: "SPyVM") -> "W_Bool":
         if self.value:
             return W_Bool._w_singleton_False
         else:
             return W_Bool._w_singleton_True
 
+
 W_Bool._w_singleton_True = W_Bool._make_singleton(True)
 W_Bool._w_singleton_False = W_Bool._make_singleton(False)
 
 
-@spytype('NotImplementedType')
+@spytype("NotImplementedType")
 class W_NotImplementedType(W_Object):
-    _w_singleton: ClassVar['W_NotImplementedType']
+    _w_singleton: ClassVar["W_NotImplementedType"]
 
     def __init__(self) -> None:
         # this is just a sanity check: we don't want people to be able to
@@ -507,6 +520,4 @@ class W_NotImplementedType(W_Object):
         raise Exception("You cannot instantiate W_NotImplementedType")
 
 
-W_NotImplementedType._w_singleton = (
-    W_NotImplementedType.__new__(W_NotImplementedType)
-)
+W_NotImplementedType._w_singleton = W_NotImplementedType.__new__(W_NotImplementedType)

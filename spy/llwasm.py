@@ -17,8 +17,9 @@ import py.path
 import wasmtime as wt
 import struct
 
-LLWasmType = Literal[None, 'void *', 'int32_t', 'int16_t']
+LLWasmType = Literal[None, "void *", "int32_t", "int16_t"]
 ENGINE = wt.Engine()
+
 
 class LLWasmModule:
     f: py.path.local
@@ -29,7 +30,7 @@ class LLWasmModule:
         self.mod = wt.Module.from_file(ENGINE, str(f))
 
     def __repr__(self) -> str:
-        return f'<LLWasmModule {self.f}>'
+        return f"<LLWasmModule {self.f}>"
 
 
 class HostModule:
@@ -38,16 +39,17 @@ class HostModule:
 
     Each host module can provide one or more WASM import, used by link().
     """
-    ll: 'LLWasmInstance' # this attribute is set by LLWasmInstance.__init__
+
+    ll: "LLWasmInstance"  # this attribute is set by LLWasmInstance.__init__
 
 
 def get_linker(
-        store: wt.Store,
-        llmod: LLWasmModule,
-        *,
-        wasi_config: Optional[wt.WasiConfig] = None,
-        hostmods: Optional[list[HostModule]] = None,
-    ) -> wt.Linker:
+    store: wt.Store,
+    llmod: LLWasmModule,
+    *,
+    wasi_config: Optional[wt.WasiConfig] = None,
+    hostmods: Optional[list[HostModule]] = None,
+) -> wt.Linker:
     """
     Setup a Linker which can be used to instantiate llmod.
 
@@ -57,14 +59,15 @@ def get_linker(
     HostModules.
     """
     hostmods = hostmods or []
+
     def find_meth(imp: Any) -> Any:
         assert hostmods is not None
-        methname = f'{imp.module}_{imp.name}'
+        methname = f"{imp.module}_{imp.name}"
         for hostmod in hostmods:
             meth = getattr(hostmod, methname, None)
             if meth is not None:
                 return meth
-        raise NotImplementedError(f'Missing WASM import: {methname}')
+        raise NotImplementedError(f"Missing WASM import: {methname}")
 
     py2w = {
         int: wt.ValType.i32(),
@@ -72,7 +75,7 @@ def get_linker(
 
     def FuncType_from_pyfunc(pyfunc: Any) -> wt.FuncType:
         annotations = pyfunc.__annotations__.copy()
-        py_restype = annotations.pop('return')
+        py_restype = annotations.pop("return")
         if py_restype is None:
             restypes = []
         else:
@@ -92,12 +95,13 @@ def get_linker(
         linker.define_wasi()
 
     for imp in llmod.mod.imports:
-        if imp.module.startswith('wasi_'):
+        if imp.module.startswith("wasi_"):
             continue
         func = get_wasmfunc(imp)
         linker.define(store, imp.module, imp.name, func)  # type: ignore
 
     return linker
+
 
 def get_wasi_config() -> wt.WasiConfig:
     wasi_config = wt.WasiConfig()
@@ -114,28 +118,23 @@ class LLWasmInstance:
     f: py.path.local
     store: wt.Store
     instance: wt.Instance
-    mem: 'LLWasmMemory'
+    mem: "LLWasmMemory"
 
-    def __init__(self, llmod: LLWasmModule,
-                 hostmods: list[HostModule]=[]) -> None:
+    def __init__(self, llmod: LLWasmModule, hostmods: list[HostModule] = []) -> None:
         self.llmod = llmod
         self.store = wt.Store(ENGINE)
         linker = get_linker(
-            self.store,
-            self.llmod,
-            wasi_config = get_wasi_config(),
-            hostmods = hostmods
+            self.store, self.llmod, wasi_config=get_wasi_config(), hostmods=hostmods
         )
         self.instance = linker.instantiate(self.store, self.llmod.mod)
-        memory = self.instance.exports(self.store).get('memory')
+        memory = self.instance.exports(self.store).get("memory")
         assert isinstance(memory, wt.Memory)
         self.mem = LLWasmMemory(self.store, memory)
         for hostmod in hostmods:
             hostmod.ll = self
 
     @classmethod
-    def from_file(cls, f: py.path.local,
-                  hostmods: list[HostModule]=[]) -> Self:
+    def from_file(cls, f: py.path.local, hostmods: list[HostModule] = []) -> Self:
         llmod = LLWasmModule(f)
         return cls(llmod, hostmods)
 
@@ -192,18 +191,19 @@ class LLWasmInstance:
         assert isinstance(addr, int)
         if deref is None:
             return addr
-        elif deref == 'int32_t' or deref == 'void *':
+        elif deref == "int32_t" or deref == "void *":
             return self.mem.read_i32(addr)
-        elif deref == 'int16_t':
+        elif deref == "int16_t":
             return self.mem.read_i16(addr)
         else:
-            assert False, f'Unknown type: {deref}'
+            assert False, f"Unknown type: {deref}"
 
 
 class LLWasmMemory:
     """
     Thin wrapper around wt.Memory
     """
+
     store: wt.Store
     mem: wt.Memory
 
@@ -215,15 +215,15 @@ class LLWasmMemory:
         """
         Read n bytes of memory at the given address.
         """
-        return self.mem.read(self.store, addr, addr+n)
+        return self.mem.read(self.store, addr, addr + n)
 
     def read_i32(self, addr: int) -> int:
         rawbytes = self.read(addr, 4)
-        return struct.unpack('i', rawbytes)[0]
+        return struct.unpack("i", rawbytes)[0]
 
     def read_i16(self, addr: int) -> int:
         rawbytes = self.read(addr, 2)
-        return struct.unpack('h', rawbytes)[0]
+        return struct.unpack("h", rawbytes)[0]
 
     def read_i8(self, addr: int) -> int:
         rawbytes = self.read(addr, 1)

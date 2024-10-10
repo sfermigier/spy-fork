@@ -3,11 +3,13 @@ from typing import TYPE_CHECKING, Optional
 from spy.fqn import QN
 from spy.vm.object import W_Object
 from spy.vm.function import W_Func
+
 if TYPE_CHECKING:
     from spy.vm.vm import SPyVM
 
 ARGS_W = list[W_Object]
 ENTRY = tuple[ARGS_W, W_Object]
+
 
 class BlueCache:
     """
@@ -18,14 +20,15 @@ class BlueCache:
 
     We should use a SPy dict, as soon as we have it.
     """
-    vm: 'SPyVM'
+
+    vm: "SPyVM"
     data: defaultdict[W_Func, list[ENTRY]]
 
-    def __init__(self, vm: 'SPyVM'):
+    def __init__(self, vm: "SPyVM"):
         self.vm = vm
         self.data = defaultdict(list)
 
-    def record(self, w_func: W_Func, args_w: ARGS_W, w_result: W_Object) ->None:
+    def record(self, w_func: W_Func, args_w: ARGS_W, w_result: W_Object) -> None:
         entry = (args_w, w_result)
         self.data[w_func].append(entry)
 

@@ -14,6 +14,7 @@ from spy.vm.b import B
 from spy.vm.modules.rawbuffer import RB
 from spy.vm.modules.types import W_TypeDef
 
+
 class WasmModuleWrapper:
     vm: SPyVM
     modname: str
@@ -36,21 +37,20 @@ class WasmModuleWrapper:
             return self.read_global(fqn)
         else:
             t = type(wasm_obj)
-            raise NotImplementedError(f'Unknown WASM object: {t}')
+            raise NotImplementedError(f"Unknown WASM object: {t}")
 
-    def read_function(self, fqn: FQN) -> 'WasmFuncWrapper':
+    def read_function(self, fqn: FQN) -> "WasmFuncWrapper":
         w_func = self.vm.lookup_global(fqn)
         assert isinstance(w_func, W_Func)
-        return WasmFuncWrapper(self.vm, self.ll,
-                               fqn.c_name, w_func.w_functype)
+        return WasmFuncWrapper(self.vm, self.ll, fqn.c_name, w_func.w_functype)
 
     def read_global(self, fqn: FQN) -> Any:
         w_type = self.vm.lookup_global_type(fqn)
         t: LLWasmType
         if w_type is B.w_i32:
-            t = 'int32_t'
+            t = "int32_t"
         else:
-            assert False, f'Unknown type: {w_type}'
+            assert False, f"Unknown type: {w_type}"
 
         return self.ll.read_global(fqn.c_name, deref=t)
 
@@ -61,8 +61,9 @@ class WasmFuncWrapper:
     c_name: str
     w_functype: W_FuncType
 
-    def __init__(self, vm: SPyVM, ll: LLSPyInstance, c_name: str,
-                 w_functype: W_FuncType) -> None:
+    def __init__(
+        self, vm: SPyVM, ll: LLSPyInstance, c_name: str, w_functype: W_FuncType
+    ) -> None:
         self.vm = vm
         self.ll = ll
         self.c_name = c_name
@@ -75,13 +76,13 @@ class WasmFuncWrapper:
             # XXX: with the GC, we need to think how to keep this alive
             return ll_spy_Str_new(self.ll, pyval)
         else:
-            assert False, f'Unsupported type: {w_type}'
+            assert False, f"Unsupported type: {w_type}"
 
     def from_py_args(self, py_args: Any) -> Any:
         a = len(py_args)
         b = self.w_functype.arity
         if a != b:
-            raise TypeError(f'{self.c_name}: expected {b} arguments, got {a}')
+            raise TypeError(f"{self.c_name}: expected {b} arguments, got {a}")
         #
         wasm_args = []
         for py_arg, param in zip(py_args, self.w_functype.params):
@@ -110,7 +111,7 @@ class WasmFuncWrapper:
             addr = res
             length = self.ll.mem.read_i32(addr)
             utf8 = self.ll.mem.read(addr + 4, length)
-            return utf8.decode('utf-8')
+            return utf8.decode("utf-8")
         elif w_type is RB.w_RawBuffer:
             # res is a  spy_RawBuffer*
             addr = res

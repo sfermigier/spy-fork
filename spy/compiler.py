@@ -11,57 +11,60 @@ from spy.vm.object import W_I32
 DUMP_C = False
 DUMP_WASM = False
 
+
 class ToolchainType(str, Enum):
     zig = "zig"
     clang = "clang"
     emscripten = "emscripten"
     native = "native"
 
+
 class Compiler:
     """
     Take a module inside a VM and compile it to C/WASM.
     """
+
     vm: SPyVM
     w_mod: W_Module
     builddir: py.path.local
-    file_c: py.path.local    # output file
-    file_wasm: py.path.local # output file
+    file_c: py.path.local  # output file
+    file_wasm: py.path.local  # output file
 
-    def __init__(self, vm: SPyVM, modname: str,
-                 builddir: py.path.local) -> None:
+    def __init__(self, vm: SPyVM, modname: str, builddir: py.path.local) -> None:
         self.vm = vm
         self.w_mod = vm.modules_w[modname]
         basename = modname
-        self.file_c = builddir.join(f'{basename}.c')
-        self.file_wasm = builddir.join(f'{basename}.wasm')
+        self.file_c = builddir.join(f"{basename}.c")
+        self.file_wasm = builddir.join(f"{basename}.wasm")
 
     def cwrite(self, target: str) -> py.path.local:
         """
         Convert the W_Module into a .c file
         """
         file_spy = py.path.local(self.w_mod.filepath)
-        self.cwriter = CModuleWriter(self.vm, self.w_mod, file_spy, self.file_c,
-                                     target)
+        self.cwriter = CModuleWriter(self.vm, self.w_mod, file_spy, self.file_c, target)
         self.cwriter.write_c_source()
         #
         if DUMP_C:
             print()
-            print(f'---- {self.file_c} ----')
+            print(f"---- {self.file_c} ----")
             print(self.file_c.read())
         #
         return self.file_c
 
-    def cbuild(self, *,
-               opt_level: int = 0,
-               debug_symbols: bool = False,
-               toolchain_type: ToolchainType = ToolchainType.zig,
-               ) -> py.path.local:
+    def cbuild(
+        self,
+        *,
+        opt_level: int = 0,
+        debug_symbols: bool = False,
+        toolchain_type: ToolchainType = ToolchainType.zig,
+    ) -> py.path.local:
         """
         Build the .c file into a .wasm file or an executable
         """
         toolchain = get_toolchain(toolchain_type)
         file_c = self.cwrite(toolchain.TARGET)
-        if toolchain.TARGET == 'wasi':
+        if toolchain.TARGET == "wasi":
             # ok, this logic is wrong: we cannot know which names we want to
             # export by simply looking at their type: for example, in case of
             # variables we want to export "red variables" but we don't want to
@@ -70,21 +73,27 @@ class Compiler:
             exports = [
                 fqn.c_name
                 for fqn, w_obj in self.w_mod.items_w()
-                if (isinstance(w_obj, W_ASTFunc) and w_obj.color == 'red' or
-                    isinstance(w_obj, W_I32))
+                if (
+                    isinstance(w_obj, W_ASTFunc)
+                    and w_obj.color == "red"
+                    or isinstance(w_obj, W_I32)
+                )
             ]
-            file_wasm = toolchain.c2wasm(file_c, self.file_wasm,
-                                         exports=exports,
-                                         opt_level=opt_level,
-                                         debug_symbols=debug_symbols)
+            file_wasm = toolchain.c2wasm(
+                file_c,
+                self.file_wasm,
+                exports=exports,
+                opt_level=opt_level,
+                debug_symbols=debug_symbols,
+            )
             if DUMP_WASM:
                 print()
-                print(f'---- {self.file_wasm} ----')
-                os.system(f'wasm2wat {file_wasm}')
+                print(f"---- {self.file_wasm} ----")
+                os.system(f"wasm2wat {file_wasm}")
             return file_wasm
         else:
             file_exe = self.file_wasm.new(ext=toolchain.EXE_FILENAME_EXT)
-            toolchain.c2exe(file_c, file_exe,
-                            opt_level=opt_level,
-                            debug_symbols=debug_symbols)
+            toolchain.c2exe(
+                file_c, file_exe, opt_level=opt_level, debug_symbols=debug_symbols
+            )
             return file_exe

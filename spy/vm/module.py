@@ -11,28 +11,26 @@ if TYPE_CHECKING:
     from spy.vm.vm import SPyVM
 
 
-
-
-@spytype('module')
+@spytype("module")
 class W_Module(W_Object):
-    vm: 'SPyVM'
+    vm: "SPyVM"
     name: str
     filepath: str
     _frozen: bool
-    __spy_storage_category__ = 'reference'
+    __spy_storage_category__ = "reference"
 
-    def __init__(self, vm: 'SPyVM', name: str, filepath: str) -> None:
+    def __init__(self, vm: "SPyVM", name: str, filepath: str) -> None:
         self.vm = vm
         self.name = name
         self.filepath = filepath
 
     def __repr__(self) -> str:
-        return f'<spy module {self.name}>'
+        return f"<spy module {self.name}>"
 
     # ==== operator impls =====
 
     @staticmethod
-    def op_GETATTR(vm: 'SPyVM', wv_obj: W_Value, wv_attr: W_Value) -> W_OpImpl:
+    def op_GETATTR(vm: "SPyVM", wv_obj: W_Value, wv_attr: W_Value) -> W_OpImpl:
         """
         Ideally, we should create a new subtype for each module, where every
         member has its own static type.
@@ -41,22 +39,24 @@ class W_Module(W_Object):
         all the module getattrs are done in blue contexts are redshifted
         away.
         """
-        @spy_builtin(QN('builtins::module_getattr'))
-        def fn(vm: 'SPyVM', w_mod: W_Module, w_attr: W_Str) -> W_Dynamic:
+
+        @spy_builtin(QN("builtins::module_getattr"))
+        def fn(vm: "SPyVM", w_mod: W_Module, w_attr: W_Str) -> W_Dynamic:
             attr = vm.unwrap_str(w_attr)
             return w_mod.getattr(attr)
+
         return W_OpImpl.simple(vm.wrap_func(fn))
 
-
     @staticmethod
-    def op_SETATTR(vm: 'SPyVM', wv_obj: W_Value, wv_attr: W_Value,
-                   wv_v: W_Value) -> W_OpImpl:
-        @spy_builtin(QN('builtins::module_setattr'))
-        def fn(vm: 'SPyVM', w_mod: W_Module, w_attr:
-                   W_Str, w_val: W_Dynamic) -> W_Void:
+    def op_SETATTR(
+        vm: "SPyVM", wv_obj: W_Value, wv_attr: W_Value, wv_v: W_Value
+    ) -> W_OpImpl:
+        @spy_builtin(QN("builtins::module_setattr"))
+        def fn(vm: "SPyVM", w_mod: W_Module, w_attr: W_Str, w_val: W_Dynamic) -> W_Void:
             attr = vm.unwrap_str(w_attr)
             w_mod.setattr(attr, w_val)
             return B.w_None
+
         return W_OpImpl.simple(vm.wrap_func(fn))
 
     # ==== public interp-level API ====
@@ -70,8 +70,9 @@ class W_Module(W_Object):
         assert w_obj is not None
         return w_obj
 
-    def getattr_astfunc(self, attr: str) -> 'W_ASTFunc':
+    def getattr_astfunc(self, attr: str) -> "W_ASTFunc":
         from spy.vm.function import W_ASTFunc
+
         w_obj = self.getattr(attr)
         assert isinstance(w_obj, W_ASTFunc)
         return w_obj
@@ -95,6 +96,6 @@ class W_Module(W_Object):
         """
         Pretty print
         """
-        print(f'Module {self.name}:')
+        print(f"Module {self.name}:")
         for attr, w_obj in self.items_w():
-            print(f'    {attr}: {w_obj}')
+            print(f"    {attr}: {w_obj}")

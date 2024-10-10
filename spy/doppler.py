@@ -16,16 +16,17 @@ if TYPE_CHECKING:
     from spy.vm.vm import SPyVM
 
 
-def redshift(vm: 'SPyVM', w_func: W_ASTFunc) -> W_ASTFunc:
+def redshift(vm: "SPyVM", w_func: W_ASTFunc) -> W_ASTFunc:
     dop = FuncDoppler(vm, w_func)
     return dop.redshift()
+
 
 class FuncDoppler:
     """
     Perform a redshift on a W_ASTFunc
     """
 
-    def __init__(self, vm: 'SPyVM', w_func: W_ASTFunc) -> None:
+    def __init__(self, vm: "SPyVM", w_func: W_ASTFunc) -> None:
         self.vm = vm
         self.w_func = w_func
         self.funcdef = w_func.funcdef
@@ -45,11 +46,12 @@ class FuncDoppler:
         new_closure = ()
         w_newfunctype = self.w_func.w_functype
         w_newfunc = W_ASTFunc(
-            qn = new_qn,
-            closure = new_closure,
-            w_functype = w_newfunctype,
-            funcdef = new_funcdef,
-            locals_types_w = self.t.locals_types_w.copy())
+            qn=new_qn,
+            closure=new_closure,
+            w_functype=w_newfunctype,
+            funcdef=new_funcdef,
+            locals_types_w=self.t.locals_types_w.copy(),
+        )
         return w_newfunc
 
     def blue_eval(self, expr: ast.Expr) -> ast.Expr:
@@ -68,7 +70,7 @@ class FuncDoppler:
         if w_type in (B.w_i32, B.w_f64, B.w_bool, B.w_str, B.w_void):
             # this is a primitive, we can just use ast.Constant
             value = self.vm.unwrap(w_val)
-            if isinstance(value, FixedInt): # type: ignore
+            if isinstance(value, FixedInt):  # type: ignore
                 value = int(value)
             return ast.Constant(loc, value)
 
@@ -86,7 +88,7 @@ class FuncDoppler:
                 fqn = self.vm.get_FQN(w_val.qn, is_global=True)
                 self.vm.add_global(fqn, None, w_val)
             else:
-                assert False, 'implement me'
+                assert False, "implement me"
 
         assert fqn is not None
         return ast.FQNConst(loc, fqn)
@@ -95,15 +97,15 @@ class FuncDoppler:
 
     def shift_stmt(self, stmt: ast.Stmt) -> list[ast.Stmt]:
         self.t.check_stmt(stmt)
-        return magic_dispatch(self, 'shift_stmt', stmt)
+        return magic_dispatch(self, "shift_stmt", stmt)
 
     def shift_expr(self, expr: ast.Expr) -> ast.Expr:
         color, w_type = self.t.check_expr(expr)
         conv = self.t.expr_conv.get(expr)
-        if color == 'blue':
-            if not conv or conv.color == 'blue':
+        if color == "blue":
+            if not conv or conv.color == "blue":
                 return self.blue_eval(expr)
-        res = magic_dispatch(self, 'shift_expr', expr)
+        res = magic_dispatch(self, "shift_expr", expr)
         if conv and isinstance(conv, JsRefConv):
             res = conv.redshift(self.vm, res)
         return res
@@ -119,7 +121,7 @@ class FuncDoppler:
 
     def shift_stmt_VarDef(self, vardef: ast.VarDef) -> list[ast.Stmt]:
         ann_color, w_ann_type = self.t.check_expr(vardef.type)
-        assert ann_color == 'blue'
+        assert ann_color == "blue"
         assert isinstance(w_ann_type, W_Type)
         self.blue_frame.exec_stmt_VarDef(vardef)
         newtype = self.shift_expr(vardef.type)
@@ -127,11 +129,11 @@ class FuncDoppler:
 
     def shift_stmt_Assign(self, assign: ast.Assign) -> list[ast.Stmt]:
         sym = self.funcdef.symtable.lookup(assign.target)
-        if sym.color == 'red':
+        if sym.color == "red":
             newvalue = self.shift_expr(assign.value)
             return [assign.replace(value=newvalue)]
         else:
-            assert False, 'implement me'
+            assert False, "implement me"
 
     def shift_stmt_SetAttr(self, node: ast.SetAttr) -> list[ast.Stmt]:
         v_target = self.shift_expr(node.target)
@@ -155,19 +157,12 @@ class FuncDoppler:
         newtest = self.shift_expr(if_node.test)
         newthen = self.shift_body(if_node.then_body)
         newelse = self.shift_body(if_node.else_body)
-        return [if_node.replace(
-            test = newtest,
-            then_body = newthen,
-            else_body = newelse
-        )]
+        return [if_node.replace(test=newtest, then_body=newthen, else_body=newelse)]
 
     def shift_stmt_While(self, while_node: ast.While) -> list[ast.While]:
         newtest = self.shift_expr(while_node.test)
         newbody = self.shift_body(while_node.body)
-        return [while_node.replace(
-            test = newtest,
-            body = newbody
-        )]
+        return [while_node.replace(test=newtest, body=newbody)]
 
     # ==== expressions ====
 
@@ -233,15 +228,17 @@ class FuncDoppler:
         This is a temporary hack. We specialize print() based on the type
         of its first argument
         """
-        if not (isinstance(call.func, ast.FQNConst) and
-                call.func.fqn == FQN.parse('builtins::print')):
+        if not (
+            isinstance(call.func, ast.FQNConst)
+            and call.func.fqn == FQN.parse("builtins::print")
+        ):
             return call
 
         assert len(call.args) == 1
         color, w_type = self.t.check_expr(call.args[0])
         t = w_type.name
         if w_type in (B.w_i32, B.w_f64, B.w_bool, B.w_void, B.w_str):
-            fqn = FQN.parse(f'builtins::print_{t}')
+            fqn = FQN.parse(f"builtins::print_{t}")
         else:
             raise SPyTypeError(f"Invalid type for print(): {t}")
 

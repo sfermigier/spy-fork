@@ -6,12 +6,14 @@ from spy.vm.function import W_FuncType, W_BuiltinFunc
 from spy.vm.sig import spy_builtin, SPyBuiltin
 from spy.vm.object import W_Object, spytype
 
+
 class ModuleRegistry:
     """
     Keep track of all the objects which belong to a certain module.
 
     At startup, the `vm` will create a W_Module out of it.
     """
+
     modname: str
     filepath: str
     content: list[tuple[QN, W_Object]]
@@ -22,6 +24,7 @@ class ModuleRegistry:
         self.content = []
 
     if TYPE_CHECKING:
+
         def __getattr__(self, attr: str) -> Any:
             """
             Workaround for mypy blindness.
@@ -38,7 +41,7 @@ class ModuleRegistry:
 
     def add(self, attr: str, w_obj: W_Object) -> None:
         qn = QN(modname=self.modname, attr=attr)
-        setattr(self, f'w_{attr}', w_obj)
+        setattr(self, f"w_{attr}", w_obj)
         self.content.append((qn, w_obj))
 
     def spytype(self, name: str) -> Callable:
@@ -56,16 +59,17 @@ class ModuleRegistry:
                 ...
             MOD.add('Foo', W_Foo._w)
         """
+
         def decorator(pyclass: Type[W_Object]) -> Type[W_Object]:
             W_class = spytype(name)(pyclass)
             self.add(name, W_class._w)
             return W_class
+
         return decorator
 
-    def builtin(self,
-                pyfunc: Optional[Callable] = None,
-                *,
-                color: Color = 'red') -> Any:
+    def builtin(
+        self, pyfunc: Optional[Callable] = None, *, color: Color = "red"
+    ) -> Any:
         """
         Register a builtin function on the module. We support two different
         syntaxes:
@@ -76,13 +80,14 @@ class ModuleRegistry:
         @MOD.builtin(color='...')
         def foo(): ...
         """
+
         def decorator(pyfunc: Callable) -> SPyBuiltin:
             attr = pyfunc.__name__
             qn = QN(modname=self.modname, attr=attr)
             # apply the @spy_builtin decorator to pyfunc
             spyfunc = spy_builtin(qn, color=color)(pyfunc)
             w_func = spyfunc._w
-            setattr(self, f'w_{attr}', w_func)
+            setattr(self, f"w_{attr}", w_func)
             self.content.append((qn, w_func))
             return spyfunc
 

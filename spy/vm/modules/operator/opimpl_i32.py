@@ -2,6 +2,7 @@ from typing import TYPE_CHECKING, Any
 from spy.vm.b import B
 from spy.vm.object import W_Object, W_Type, W_I32, W_Bool
 from . import OP
+
 if TYPE_CHECKING:
     from spy.vm.vm import SPyVM
 
@@ -10,49 +11,60 @@ if TYPE_CHECKING:
 # magic. Or, it would be nice to have automatic unwrapping.
 # Let's to the dumb&verbose thing for now
 
-def _i32_op(vm: 'SPyVM', w_a: W_Object, w_b: W_Object, fn: Any) -> Any:
+
+def _i32_op(vm: "SPyVM", w_a: W_Object, w_b: W_Object, fn: Any) -> Any:
     a = vm.unwrap_i32(w_a)
     b = vm.unwrap_i32(w_b)
     res = fn(a, b)
     return vm.wrap(res)
 
+
 @OP.builtin
-def i32_add(vm: 'SPyVM', w_a: W_I32, w_b: W_I32) -> W_I32:
+def i32_add(vm: "SPyVM", w_a: W_I32, w_b: W_I32) -> W_I32:
     return _i32_op(vm, w_a, w_b, lambda a, b: a + b)
 
-@OP.builtin
-def i32_sub(vm: 'SPyVM', w_a: W_I32, w_b: W_I32) -> W_I32:
-    return _i32_op(vm, w_a, w_b, lambda a, b: a - b)
 
 @OP.builtin
-def i32_mul(vm: 'SPyVM', w_a: W_I32, w_b: W_I32) -> W_I32:
+def i32_sub(vm: "SPyVM", w_a: W_I32, w_b: W_I32) -> W_I32:
+    return _i32_op(vm, w_a, w_b, lambda a, b: a - b)
+
+
+@OP.builtin
+def i32_mul(vm: "SPyVM", w_a: W_I32, w_b: W_I32) -> W_I32:
     return _i32_op(vm, w_a, w_b, lambda a, b: a * b)
+
 
 # XXX: should we do floor division or float division?
 @OP.builtin
-def i32_div(vm: 'SPyVM', w_a: W_I32, w_b: W_I32) -> W_I32:
+def i32_div(vm: "SPyVM", w_a: W_I32, w_b: W_I32) -> W_I32:
     return _i32_op(vm, w_a, w_b, lambda a, b: a // b)
 
+
 @OP.builtin
-def i32_eq(vm: 'SPyVM', w_a: W_I32, w_b: W_I32) -> W_Bool:
+def i32_eq(vm: "SPyVM", w_a: W_I32, w_b: W_I32) -> W_Bool:
     return _i32_op(vm, w_a, w_b, lambda a, b: a == b)
 
+
 @OP.builtin
-def i32_ne(vm: 'SPyVM', w_a: W_I32, w_b: W_I32) -> W_Bool:
+def i32_ne(vm: "SPyVM", w_a: W_I32, w_b: W_I32) -> W_Bool:
     return _i32_op(vm, w_a, w_b, lambda a, b: a != b)
 
+
 @OP.builtin
-def i32_lt(vm: 'SPyVM', w_a: W_I32, w_b: W_I32) -> W_Bool:
+def i32_lt(vm: "SPyVM", w_a: W_I32, w_b: W_I32) -> W_Bool:
     return _i32_op(vm, w_a, w_b, lambda a, b: a < b)
 
+
 @OP.builtin
-def i32_le(vm: 'SPyVM', w_a: W_I32, w_b: W_I32) -> W_Bool:
+def i32_le(vm: "SPyVM", w_a: W_I32, w_b: W_I32) -> W_Bool:
     return _i32_op(vm, w_a, w_b, lambda a, b: a <= b)
 
-@OP.builtin
-def i32_gt(vm: 'SPyVM', w_a: W_I32, w_b: W_I32) -> W_Bool:
-    return _i32_op(vm, w_a, w_b, lambda a, b: a > b)
 
 @OP.builtin
-def i32_ge(vm: 'SPyVM', w_a: W_I32, w_b: W_I32) -> W_Bool:
+def i32_gt(vm: "SPyVM", w_a: W_I32, w_b: W_I32) -> W_Bool:
+    return _i32_op(vm, w_a, w_b, lambda a, b: a > b)
+
+
+@OP.builtin
+def i32_ge(vm: "SPyVM", w_a: W_I32, w_b: W_I32) -> W_Bool:
     return _i32_op(vm, w_a, w_b, lambda a, b: a >= b)

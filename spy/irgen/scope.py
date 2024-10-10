@@ -28,6 +28,7 @@ class ScopeAnalyzer:
     use Python's rules to make porting easier, e.g. by using `from __python__
     import scoping_rules`, but for now it's not a priority.
     """
+
     vm: SPyVM
     mod: ast.Module
     stack: list[SymTable]
@@ -43,13 +44,12 @@ class ScopeAnalyzer:
         self.push_scope(self.builtins_scope)
         self.push_scope(self.mod_scope)
 
-
     # ===============
     # public API
     # ================
 
     def analyze(self) -> None:
-        assert len(self.stack) == 2 # [builtins, module]
+        assert len(self.stack) == 2  # [builtins, module]
         for decl in self.mod.decls:
             self.declare(decl)
         assert len(self.stack) == 2
@@ -89,31 +89,33 @@ class ScopeAnalyzer:
         # not found
         return -1, None
 
-    def add_name(self,
-                 name: str,
-                 color: ast.Color,
-                 loc: Loc,
-                 type_loc: Loc,
-                 *,
-                 fqn: Optional[FQN] = None
-                 ) -> None:
+    def add_name(
+        self,
+        name: str,
+        color: ast.Color,
+        loc: Loc,
+        type_loc: Loc,
+        *,
+        fqn: Optional[FQN] = None,
+    ) -> None:
         """
         Add a name to the current scope.
 
         The level of the new symbol will be 0.
         """
         level, sym = self.lookup(name)
-        if sym and name != '@return':
+        if sym and name != "@return":
             if level == 0:
                 # re-declaration in the same scope
-                msg = f'variable `{name}` already declared'
+                msg = f"variable `{name}` already declared"
             else:
                 # shadowing a name in an outer scope
-                msg = (f'variable `{name}` shadows a name declared ' +
-                       "in an outer scope")
+                msg = (
+                    f"variable `{name}` shadows a name declared " + "in an outer scope"
+                )
             err = SPyScopeError(msg)
-            err.add('error', 'this is the new declaration', loc)
-            err.add('note', 'this is the previous declaration', sym.loc)
+            err.add("error", "this is the new declaration", loc)
+            err.add("note", "this is the previous declaration", sym.loc)
             raise err
 
         if fqn is None and self.scope is self.mod_scope:
@@ -130,65 +132,67 @@ class ScopeAnalyzer:
         Visit all the nodes which introduce a new name in the scope, and declare
         those names.
         """
-        return node.visit('declare', self)
+        return node.visit("declare", self)
 
     def declare_Import(self, imp: ast.Import) -> None:
         w_obj = self.vm.lookup_global(imp.fqn)
         if w_obj is not None:
-            self.add_name(imp.asname, 'blue', imp.loc, imp.loc, fqn=imp.fqn)
+            self.add_name(imp.asname, "blue", imp.loc, imp.loc, fqn=imp.fqn)
             return
         #
-        err = SPyImportError(f'cannot import `{imp.fqn.spy_name}`')
+        err = SPyImportError(f"cannot import `{imp.fqn.spy_name}`")
         if imp.fqn.modname not in self.vm.modules_w:
             # module not found
-            err.add('error',
-                    f'module `{imp.fqn.modname}` does not exist',
-                    loc=imp.loc)
+            err.add("error", f"module `{imp.fqn.modname}` does not exist", loc=imp.loc)
         else:
             # attribute not found
-            err.add('error',
-                    f'attribute `{imp.fqn.attr}` does not exist ' +
-                    f'in module `{imp.fqn.modname}`',
-                    loc=imp.loc_asname)
+            err.add(
+                "error",
+                f"attribute `{imp.fqn.attr}` does not exist "
+                + f"in module `{imp.fqn.modname}`",
+                loc=imp.loc_asname,
+            )
         raise err
 
     def declare_GlobalVarDef(self, decl: ast.GlobalVarDef) -> None:
         color: Color
-        if decl.vardef.kind == 'var':
-            color = 'red'
+        if decl.vardef.kind == "var":
+            color = "red"
         else:
-            color = 'blue'
+            color = "blue"
         self.add_name(decl.vardef.name, color, decl.loc, decl.vardef.type.loc)
 
     def declare_VarDef(self, vardef: ast.VarDef) -> None:
-        assert vardef.kind == 'var'
-        self.add_name(vardef.name, 'red', vardef.loc, vardef.type.loc)
+        assert vardef.kind == "var"
+        self.add_name(vardef.name, "red", vardef.loc, vardef.type.loc)
 
     def declare_FuncDef(self, funcdef: ast.FuncDef) -> None:
         # declare the func in the "outer" scope
-        self.add_name(funcdef.name, 'blue', funcdef.prototype_loc,
-                      funcdef.prototype_loc)
+        self.add_name(
+            funcdef.name, "blue", funcdef.prototype_loc, funcdef.prototype_loc
+        )
         inner_scope = SymTable(funcdef.name)
         self.push_scope(inner_scope)
         self.funcdef_scopes[funcdef] = inner_scope
         for arg in funcdef.args:
-            self.add_name(arg.name, 'red', arg.loc, arg.type.loc)
-        self.add_name('@return', 'red', funcdef.return_type.loc,
-                      funcdef.return_type.loc)
+            self.add_name(arg.name, "red", arg.loc, arg.type.loc)
+        self.add_name(
+            "@return", "red", funcdef.return_type.loc, funcdef.return_type.loc
+        )
         for stmt in funcdef.body:
             self.declare(stmt)
         self.pop_scope()
 
     def declare_Assign(self, assign: ast.Assign) -> None:
-        self._declare_target_maybe(assign.target, assign.target_loc,
-                                   assign.value)
+        self._declare_target_maybe(assign.target, assign.target_loc, assign.value)
 
     def declare_UnpackAssign(self, unpack: ast.UnpackAssign) -> None:
         for target, loc in unpack.targlocs:
             self._declare_target_maybe(target, loc, unpack.value)
 
-    def _declare_target_maybe(self, target: str, target_loc: Loc,
-                              value: ast.Expr) -> None:
+    def _declare_target_maybe(
+        self, target: str, target_loc: Loc, value: ast.Expr
+    ) -> None:
         # if target name does not exist elsewhere, we treat it as an implicit
         # declaration
         level, sym = self.lookup(target)
@@ -197,7 +201,7 @@ class ScopeAnalyzer:
             # "value" to be the type_loc, because it's where the type will be
             # computed from
             type_loc = value.loc
-            self.add_name(target, 'red', target_loc, type_loc)
+            self.add_name(target, "red", target_loc, type_loc)
 
     # ===
 
@@ -220,7 +224,7 @@ class ScopeAnalyzer:
         In particular, introduce a symbol for every Name which is used inside
         a function but defined in some outer scope.
         """
-        return node.visit('flatten', self)
+        return node.visit("flatten", self)
 
     def flatten_FuncDef(self, funcdef: ast.FuncDef) -> None:
         # the TYPES of the arguments are evaluated in the outer scope

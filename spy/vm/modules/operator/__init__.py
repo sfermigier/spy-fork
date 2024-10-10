@@ -39,12 +39,14 @@ In this case, the dispatch will be done on the dynamic type of the operands.
 from spy.vm.function import W_Func
 from spy.vm.registry import ModuleRegistry
 
+
 class OperatorRegistry(ModuleRegistry):
     """
     Like ModuleRegistry, but adds a from_token method.
     """
 
     _from_token: dict[str, W_Func] = {}
+
     def from_token(self, token: str) -> W_Func:
         """
         Return the generic operator corresponding to the given token.
@@ -63,33 +65,35 @@ class OperatorRegistry(ModuleRegistry):
         raise KeyError(w_OP)
 
 
-OPERATOR = OperatorRegistry('operator', '<operator>')
+OPERATOR = OperatorRegistry("operator", "<operator>")
 OP = OPERATOR
 
 # the folloing imports register all the various objects on OP
-from . import opimpl_i32     # side effects
-from . import opimpl_f64     # side effects
-from . import opimpl_str     # side effects
+from . import opimpl_i32  # side effects
+from . import opimpl_f64  # side effects
+from . import opimpl_str  # side effects
 from . import opimpl_object  # side effects
-from . import opimpl_dynamic # side effects
-from . import binop          # side effects
-from . import attrop         # side effects
-from . import itemop         # side effects
-from . import callop         # side effects
+from . import opimpl_dynamic  # side effects
+from . import binop  # side effects
+from . import attrop  # side effects
+from . import itemop  # side effects
+from . import callop  # side effects
 
 # fill the _from_token dict
-OP._from_token.update({
-    '+': OP.w_ADD,
-    '-': OP.w_SUB,
-    '*': OP.w_MUL,
-    '/': OP.w_DIV,
-    '==': OP.w_EQ,
-    '!=': OP.w_NE,
-    '<':  OP.w_LT,
-    '<=': OP.w_LE,
-    '>':  OP.w_GT,
-    '>=': OP.w_GE,
-    '[]': OP.w_GETITEM,
-    '<universal_eq>': OP.w_UNIVERSAL_EQ,
-    '<universal_ne>': OP.w_UNIVERSAL_NE,
-})
+OP._from_token.update(
+    {
+        "+": OP.w_ADD,
+        "-": OP.w_SUB,
+        "*": OP.w_MUL,
+        "/": OP.w_DIV,
+        "==": OP.w_EQ,
+        "!=": OP.w_NE,
+        "<": OP.w_LT,
+        "<=": OP.w_LE,
+        ">": OP.w_GT,
+        ">=": OP.w_GE,
+        "[]": OP.w_GETITEM,
+        "<universal_eq>": OP.w_UNIVERSAL_EQ,
+        "<universal_ne>": OP.w_UNIVERSAL_NE,
+    }
+)
