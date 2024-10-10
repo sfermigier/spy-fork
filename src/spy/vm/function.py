@@ -1,11 +1,12 @@
-from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Optional
 from collections.abc import Callable
+from dataclasses import dataclass
+from itertools import starmap
+from typing import TYPE_CHECKING, Any, Optional
+
 from spy import ast
 from spy.ast import Color
 from spy.fqn import QN
 from spy.vm.object import W_Object, W_Type, W_Void
-from itertools import starmap
 
 if TYPE_CHECKING:
     from spy.vm.vm import SPyVM

@@ -66,9 +66,7 @@ class ModuleRegistry:
 
         return decorator
 
-    def builtin(
-        self, pyfunc: Callable | None = None, *, color: Color = "red"
-    ) -> Any:
+    def builtin(self, pyfunc: Callable | None = None, *, color: Color = "red") -> Any:
         """
         Register a builtin function on the module. We support two different
         syntaxes:

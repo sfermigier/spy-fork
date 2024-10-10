@@ -255,7 +255,9 @@ class SPyVM:
             return B.w_False
         if T is str:
             return W_Str(self, value)
-        if (isinstance(value, type) and issubclass(value, W_Object)) or isinstance(value, SPyBuiltin):
+        if (isinstance(value, type) and issubclass(value, W_Object)) or isinstance(
+            value, SPyBuiltin
+        ):
             return value._w
         if isinstance(value, FunctionType):
             raise Exception(

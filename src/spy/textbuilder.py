@@ -43,9 +43,7 @@ class TextBuilder:
         it will be built automatically when the outer is built.
         """
         if self.lines[-1] != "":
-            raise ValueError(
-                "make_nested_builder can be called only after a newline"
-            )
+            raise ValueError("make_nested_builder can be called only after a newline")
         nested = TextBuilder(use_colors=self.use_colors)
         nested.level = self.level
         self.lines[-1] = nested

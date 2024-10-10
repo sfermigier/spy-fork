@@ -72,8 +72,7 @@ class Compiler:
                 fqn.c_name
                 for fqn, w_obj in self.w_mod.items_w()
                 if (
-                    (isinstance(w_obj, W_ASTFunc)
-                    and w_obj.color == "red")
+                    (isinstance(w_obj, W_ASTFunc) and w_obj.color == "red")
                     or isinstance(w_obj, W_I32)
                 )
             ]

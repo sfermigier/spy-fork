@@ -65,7 +65,9 @@ class Toolchain:
         cmdline += ["-o", str(file_out), str(file_c)]
         cmdline += self.LDFLAGS + EXTRA_LDFLAGS
         # print(' '.join(cmdline))
-        proc = subprocess.run(cmdline, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, check=False)
+        proc = subprocess.run(
+            cmdline, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, check=False
+        )
         if proc.returncode != 0:
             lines = ["Compilation failed!"]
             lines.append(" ".join(cmdline))

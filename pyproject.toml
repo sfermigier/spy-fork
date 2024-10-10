@@ -11,14 +11,6 @@ dependencies = [
     "ziglang==0.13.0",
 ]
 
-[tool.pytest.ini_options]
-markers = [
-    "interp: mark tests executed with the 'interp' backend",
-    "doppler: mark tests executed with the 'doppler' backend",
-    "C: mark tests executed with the 'C' backend",
-    "emscripten: mark tests executed via emscripten",
-]
-
 [tool.uv]
 dev-dependencies = [
     "abilian-devtools>=0.6",
@@ -29,14 +21,16 @@ dev-dependencies = [
     "tox>=4.21.2",
 ]
 
-#[tool.hatch]
-#build.targets.sdist.include = [
-#    "/src",
-#    "/tests",
-#]
-
 [build-system]
 build-backend = "hatchling.build"
 requires = [
     "hatchling>=1.25",
+]
+
+[tool.pytest.ini_options]
+markers = [
+    "interp: mark tests executed with the 'interp' backend",
+    "doppler: mark tests executed with the 'doppler' backend",
+    "C: mark tests executed with the 'C' backend",
+    "emscripten: mark tests executed via emscripten",
 ]

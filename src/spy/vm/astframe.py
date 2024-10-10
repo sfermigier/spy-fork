@@ -1,18 +1,21 @@
-from typing import TYPE_CHECKING
+from __future__ import annotations
+
 from types import NoneType
+from typing import TYPE_CHECKING
+
 from spy import ast
-from spy.fqn import QN
 from spy.errors import (
     SPyTypeError,
     SPyRuntimeError,
 )
+from spy.fqn import QN
+from spy.util import magic_dispatch
 from spy.vm.b import B
-from spy.vm.object import W_Object, W_Type
 from spy.vm.function import W_Func, W_FuncType, W_ASTFunc, Namespace
 from spy.vm.list import W_List
+from spy.vm.object import W_Object, W_Type
 from spy.vm.tuple import W_Tuple
 from spy.vm.typechecker import TypeChecker
-from spy.util import magic_dispatch
 
 if TYPE_CHECKING:
     from spy.vm.vm import SPyVM
