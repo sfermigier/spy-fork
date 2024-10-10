@@ -1,20 +1,17 @@
-from typing import TYPE_CHECKING, Optional, NoReturn, Any, Literal
-from collections.abc import Sequence
+from typing import TYPE_CHECKING, NoReturn, Literal
 from types import NoneType
 from spy import ast
-from spy.fqn import QN, FQN
 from spy.irgen.symtable import Symbol, Color
 from spy.errors import SPyTypeError, SPyNameError, maybe_plural
 from spy.location import Loc
-from spy.vm.object import W_Object, W_Type
+from spy.vm.object import W_Type
 from spy.vm.opimpl import W_OpImpl, W_Value
 from spy.vm.list import W_List
-from spy.vm.function import W_FuncType, W_ASTFunc, W_Func
+from spy.vm.function import W_FuncType, W_ASTFunc
 from spy.vm.b import B
 from spy.vm.modules.operator import OP
 from spy.vm.modules.jsffi import JSFFI
 from spy.vm.typeconverter import TypeConverter, DynamicCast, NumericConv, JsRefConv
-from spy.vm.modules.types import W_TypeDef
 from spy.util import magic_dispatch
 
 if TYPE_CHECKING:
@@ -39,8 +36,7 @@ def maybe_blue(*colors: Color) -> Color:
     """
     if set(colors) == {"blue"}:
         return "blue"
-    else:
-        return "red"
+    return "red"
 
 
 class TypeChecker:
@@ -128,10 +124,9 @@ class TypeChecker:
         """
         if expr in self.expr_types:
             return self.expr_types[expr]
-        else:
-            color, w_type = magic_dispatch(self, "check_expr", expr)
-            self.expr_types[expr] = color, w_type
-            return color, w_type
+        color, w_type = magic_dispatch(self, "check_expr", expr)
+        self.expr_types[expr] = color, w_type
+        return color, w_type
 
     def check_many_exprs(
         self, prefixes: list[str], exprs: list[ast.Expr | str]
@@ -266,33 +261,32 @@ class TypeChecker:
         if sym is None:
             msg = f"name `{name.id}` is not defined"
             raise SPyNameError.simple(msg, "not found in this scope", name.loc)
-        elif sym.fqn:
+        if sym.fqn:
             # XXX this is wrong: we should keep track of the static type of
             # FQNs. For now, we just look it up and use the dynamic type
             w_value = self.vm.lookup_global(sym.fqn)
             assert w_value is not None
             return sym.color, self.vm.dynamic_type(w_value)
-        elif sym.is_local:
+        if sym.is_local:
             return sym.color, self.locals_types_w[name.id]
-        else:
-            # closed-over variables are always blue
-            namespace = self.w_func.closure[sym.level]
-            w_value = namespace[sym.name]
-            assert w_value is not None
-            return "blue", self.vm.dynamic_type(w_value)
+        # closed-over variables are always blue
+        namespace = self.w_func.closure[sym.level]
+        w_value = namespace[sym.name]
+        assert w_value is not None
+        return "blue", self.vm.dynamic_type(w_value)
 
     def check_expr_Constant(self, const: ast.Constant) -> tuple[Color, W_Type]:
         T = type(const.value)
         assert T in (int, float, bool, str, NoneType)
         if T is int:
             return "blue", B.w_i32
-        elif T is float:
+        if T is float:
             return "blue", B.w_f64
-        elif T is bool:
+        if T is bool:
             return "blue", B.w_bool
-        elif T is str:
+        if T is str:
             return "blue", B.w_str
-        elif T is NoneType:
+        if T is NoneType:
             return "blue", B.w_void
         assert False
 
@@ -502,7 +496,7 @@ def _call_error_wrong_argcount(
     assert got != exp
     takes = maybe_plural(exp, f"takes {exp} argument")
     supplied = maybe_plural(
-        got, f"1 argument was supplied", f"{got} arguments were supplied"
+        got, "1 argument was supplied", f"{got} arguments were supplied"
     )
     err = SPyTypeError(f"this function {takes} but {supplied}")
     #
@@ -522,7 +516,6 @@ def _call_error_wrong_argcount(
             # XXX this assumes that all the arguments are on the same line
             loc = first_extra_loc.replace(col_end=last_extra_loc.col_end)
             err.add("error", f"{diff} extra {arguments}", loc)
-    #
     if def_loc:
         err.add("note", "function defined here", def_loc)
     raise err
@@ -550,11 +543,11 @@ def convert_type_maybe(
     if vm.issubclass(w_exp, w_got):
         # implicit upcast
         return DynamicCast(w_exp)
-    elif w_got is B.w_i32 and w_exp is B.w_f64:
+    if w_got is B.w_i32 and w_exp is B.w_f64:
         return NumericConv(w_type=w_exp, w_fromtype=w_got)
-    elif w_exp is JSFFI.w_JsRef and w_got in (B.w_str, B.w_i32):
+    if w_exp is JSFFI.w_JsRef and w_got in (B.w_str, B.w_i32):
         return JsRefConv(w_type=JSFFI.w_JsRef, w_fromtype=w_got)
-    elif w_exp is JSFFI.w_JsRef and isinstance(w_got, W_FuncType):
+    if w_exp is JSFFI.w_JsRef and isinstance(w_got, W_FuncType):
         assert w_got == W_FuncType.parse("def() -> void")
         return JsRefConv(w_type=JSFFI.w_JsRef, w_fromtype=w_got)
 

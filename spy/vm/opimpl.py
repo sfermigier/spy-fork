@@ -114,8 +114,7 @@ class W_Value(W_Object):
 
         if w_ltype is w_rtype:
             return W_OpImpl.simple(vm.wrap_func(value_eq))
-        else:
-            return W_OpImpl.NULL
+        return W_OpImpl.NULL
 
 
 @no_type_check
@@ -168,15 +167,14 @@ class W_OpImpl(W_Object):
 
     def __repr__(self) -> str:
         if self._w_func is None:
-            return f"<spy OpImpl NULL>"
-        elif self._args_wv is None:
+            return "<spy OpImpl NULL>"
+        if self._args_wv is None:
             qn = self._w_func.qn
             return f"<spy OpImpl {qn}>"
-        else:
-            qn = self._w_func.qn
-            argnames = [wv.name for wv in self._args_wv]
-            argnames = ", ".join(argnames)
-            return f"<spy OpImpl {qn}({argnames})>"
+        qn = self._w_func.qn
+        argnames = [wv.name for wv in self._args_wv]
+        argnames = ", ".join(argnames)
+        return f"<spy OpImpl {qn}({argnames})>"
 
     def is_null(self) -> bool:
         return self._w_func is None
@@ -215,12 +213,10 @@ class W_OpImpl(W_Object):
             if conv is not None:
                 w_arg = conv.convert(vm, w_arg)
             real_args_w.append(w_arg)
-        #
         if self.is_direct_call():
             w_func = orig_args_w[0]
             return vm.call(w_func, real_args_w)
-        else:
-            return vm.call(self._w_func, real_args_w)
+        return vm.call(self._w_func, real_args_w)
 
     def redshift_args(self, vm: "SPyVM", orig_args: list[ast.Expr]) -> list[ast.Expr]:
         assert self.is_valid()

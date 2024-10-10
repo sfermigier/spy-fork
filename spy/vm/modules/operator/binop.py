@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING
 from spy.vm.b import B
-from spy.vm.object import W_Dynamic, W_Type
+from spy.vm.object import W_Type
 from spy.vm.opimpl import W_OpImpl, W_Value
 from . import OP
 from .multimethod import MultiMethodTable
@@ -121,7 +121,7 @@ def EQ(vm: "SPyVM", wv_l: W_Value, wv_r: W_Value) -> W_OpImpl:
             errmsg="cannot do `{0}` == `{1}`",
         )
         return w_opimpl
-    elif can_use_reference_eq(vm, w_ltype, w_rtype):
+    if can_use_reference_eq(vm, w_ltype, w_rtype):
         w_opimpl = W_OpImpl.simple(OP.w_object_is)
         typecheck_opimpl(
             vm,
@@ -131,8 +131,7 @@ def EQ(vm: "SPyVM", wv_l: W_Value, wv_r: W_Value) -> W_OpImpl:
             errmsg="cannot do `{0}` == `{1}`",
         )
         return w_opimpl
-    else:
-        return MM.lookup(vm, "==", wv_l, wv_r)
+    return MM.lookup(vm, "==", wv_l, wv_r)
 
 
 @OP.builtin(color="blue")

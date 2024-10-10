@@ -48,12 +48,11 @@ from __future__ import annotations
 
 import fixedint
 import typing
-from typing import TYPE_CHECKING, ClassVar, Type, Any, Annotated, Optional, Union
+from typing import TYPE_CHECKING, ClassVar, Any, Annotated
 from spy.fqn import QN
 
 if TYPE_CHECKING:
     from spy.vm.vm import SPyVM
-    from spy.vm.str import W_Str
     from spy.vm.opimpl import W_OpImpl
 
 # Basic setup of the object model: <object> and <type>
@@ -480,7 +479,6 @@ class W_F64(W_Object):
 @spytype("bool")
 class W_Bool(W_Object):
     value: bool
-    #
     _w_singleton_True: ClassVar[W_Bool]
     _w_singleton_False: ClassVar[W_Bool]
 
@@ -504,8 +502,7 @@ class W_Bool(W_Object):
     def not_(self, vm: SPyVM) -> W_Bool:
         if self.value:
             return W_Bool._w_singleton_False
-        else:
-            return W_Bool._w_singleton_True
+        return W_Bool._w_singleton_True
 
 
 W_Bool._w_singleton_True = W_Bool._make_singleton(True)

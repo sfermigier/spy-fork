@@ -1,6 +1,5 @@
 from typing import TYPE_CHECKING, Any
-from spy.vm.b import B
-from spy.vm.object import W_Object, W_Type, W_I32, W_Bool
+from spy.vm.object import W_Object, W_I32, W_Bool
 from . import OP
 
 if TYPE_CHECKING:

@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, Any
 from collections.abc import Callable
 from spy.fqn import QN
 from spy.ast import Color
-from spy.vm.object import W_Object, W_Type, W_Dynamic, w_DynamicType, W_Void
+from spy.vm.object import W_Object, W_Dynamic, w_DynamicType, W_Void
 from spy.vm.function import FuncParam, W_FuncType, W_BuiltinFunc
 
 if TYPE_CHECKING:
@@ -23,21 +23,19 @@ def to_spy_FuncParam(p: Any) -> FuncParam:
         name = p.name[2:]
     else:
         name = p.name
-    #
     pyclass = p.annotation
     if pyclass is W_Dynamic:
         return FuncParam(name, B_w_dynamic)
-    elif issubclass(pyclass, W_Object):
+    if issubclass(pyclass, W_Object):
         return FuncParam(name, pyclass._w)
-    else:
-        raise ValueError(f"Invalid param: '{p}'")
+    raise ValueError(f"Invalid param: '{p}'")
 
 
 def functype_from_sig(fn: Callable, color: Color) -> W_FuncType:
     sig = inspect.signature(fn)
     params = list(sig.parameters.values())
     if len(params) == 0:
-        msg = f"The first param should be 'vm: SPyVM'. Got nothing"
+        msg = "The first param should be 'vm: SPyVM'. Got nothing"
         raise ValueError(msg)
     if params[0].name != "vm" or params[0].annotation != "SPyVM":
         msg = f"The first param should be 'vm: SPyVM'. Got '{params[0]}'"

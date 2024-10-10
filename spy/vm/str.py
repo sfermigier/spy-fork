@@ -1,7 +1,7 @@
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 from spy.llwasm import LLWasmInstance
 from spy.fqn import QN
-from spy.vm.object import W_Object, W_Type, W_Dynamic, spytype, W_I32
+from spy.vm.object import W_Object, spytype, W_I32
 from spy.vm.sig import spy_builtin
 from spy.vm.opimpl import W_OpImpl, W_Value
 from spy.vm.list import W_List
@@ -93,8 +93,7 @@ class W_Str(W_Object):
         if len(args_wv) == 1 and args_wv[0].w_static_type is B.w_i32:
             wv_i = args_wv[0]
             return W_OpImpl.with_values(vm.wrap_func(int2str), [wv_i])
-        else:
-            return W_OpImpl.NULL
+        return W_OpImpl.NULL
 
 
 @spy_builtin(QN("builtins::int2str"))

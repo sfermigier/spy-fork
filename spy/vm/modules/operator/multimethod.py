@@ -72,7 +72,6 @@ class MultiMethodTable:
             if w_func:
                 w_opimpl = W_OpImpl.simple(w_func)
                 break
-        #
         typecheck_opimpl(
             vm,
             w_opimpl,

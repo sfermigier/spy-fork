@@ -1,16 +1,12 @@
 from typing import TYPE_CHECKING, Literal, no_type_check
 from spy.fqn import QN
 from spy.vm.b import B
-from spy.vm.object import W_Object, W_Type, W_Dynamic, W_Void
-from spy.vm.module import W_Module
+from spy.vm.object import W_Type, W_Void
 from spy.vm.str import W_Str
-from spy.vm.function import W_Func
 from spy.vm.sig import spy_builtin
 from spy.vm.opimpl import W_OpImpl, W_Value
-from spy.vm.modules.types import W_TypeDef
 
 from . import OP
-from .binop import MM
 
 if TYPE_CHECKING:
     from spy.vm.vm import SPyVM
@@ -21,8 +17,7 @@ OpKind = Literal["get", "set"]
 def unwrap_attr_maybe(vm: "SPyVM", wv_attr: W_Value) -> str:
     if wv_attr.is_blue() and wv_attr.w_static_type is B.w_str:
         return vm.unwrap_str(wv_attr.w_blueval)
-    else:
-        return "<unknown>"
+    return "<unknown>"
 
 
 @OP.builtin(color="blue")
@@ -48,9 +43,9 @@ def _get_GETATTR_opimpl(
     pyclass = w_type.pyclass
     if w_type is B.w_dynamic:
         raise NotImplementedError("implement me")
-    elif attr in pyclass.__spy_members__:
+    if attr in pyclass.__spy_members__:
         return opimpl_member("get", vm, w_type, attr)
-    elif pyclass.has_meth_overriden("op_GETATTR"):
+    if pyclass.has_meth_overriden("op_GETATTR"):
         return pyclass.op_GETATTR(vm, wv_obj, wv_attr)
 
     # until commit fc4ff1b we had special logic for typedef. At some point we
@@ -78,9 +73,9 @@ def _get_SETATTR_opimpl(
     pyclass = w_type.pyclass
     if w_type is B.w_dynamic:
         return W_OpImpl.simple(OP.w_dynamic_setattr)
-    elif attr in pyclass.__spy_members__:
+    if attr in pyclass.__spy_members__:
         return opimpl_member("set", vm, w_type, attr)
-    elif pyclass.has_meth_overriden("op_SETATTR"):
+    if pyclass.has_meth_overriden("op_SETATTR"):
         return pyclass.op_SETATTR(vm, wv_obj, wv_attr, wv_v)
 
     # until commit fc4ff1b we had special logic for typedef. At some point we
@@ -107,7 +102,7 @@ def opimpl_member(kind: OpKind, vm: "SPyVM", w_type: W_Type, attr: str) -> W_OpI
 
         return W_OpImpl.simple(vm.wrap_func(opimpl_get))
 
-    elif kind == "set":
+    if kind == "set":
 
         @no_type_check
         @spy_builtin(QN(modname=w_type.name, attr=f"__set_{attr}__"))
@@ -118,5 +113,4 @@ def opimpl_member(kind: OpKind, vm: "SPyVM", w_type: W_Type, attr: str) -> W_OpI
 
         return W_OpImpl.simple(vm.wrap_func(opimpl_set))
 
-    else:
-        assert False, f"Invalid OpKind: {kind}"
+    assert False, f"Invalid OpKind: {kind}"

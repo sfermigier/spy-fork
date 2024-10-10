@@ -1,25 +1,15 @@
 from typing import TYPE_CHECKING
-import struct
 from spy.fqn import QN
-from spy.vm.b import B
-from spy.vm.object import spytype, Member, Annotated
 from spy.vm.w import (
     W_Func,
-    W_Type,
     W_Object,
-    W_I32,
-    W_F64,
-    W_Void,
     W_Str,
-    W_Dynamic,
     W_List,
-    W_FuncType,
 )
 from spy.vm.list import W_List
 from spy.vm.opimpl import W_OpImpl, W_Value
 from spy.vm.sig import spy_builtin
 from spy.vm.registry import ModuleRegistry
-from spy.vm.modules.types import W_TypeDef
 
 if TYPE_CHECKING:
     from spy.vm.vm import SPyVM
@@ -62,8 +52,7 @@ class W_JsRef(W_Object):
         n = len(args_wv)
         if n == 1:
             return W_OpImpl.simple(JSFFI.w_call_method_1)
-        else:
-            raise Exception(f"unsupported number of arguments for CALL_METHOD: {n}")
+        raise Exception(f"unsupported number of arguments for CALL_METHOD: {n}")
 
 
 @JSFFI.builtin

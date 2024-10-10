@@ -5,6 +5,7 @@ from spy import ast
 from spy.ast import Color
 from spy.fqn import QN
 from spy.vm.object import W_Object, W_Type, W_Void
+from itertools import starmap
 
 if TYPE_CHECKING:
     from spy.vm.vm import SPyVM
@@ -57,7 +58,7 @@ class W_FuncType(W_Type):
         Small helper to make it easier to build W_FuncType, especially in
         tests
         """
-        params = [FuncParam(key, w_type) for key, w_type in kwargs.items()]
+        params = list(starmap(FuncParam, kwargs.items()))
         return cls(params, w_restype, color=color)
 
     @classmethod
@@ -86,7 +87,6 @@ class W_FuncType(W_Type):
                 continue
             argname, argtype = map(str.strip, arg.split(":"))
             kwargs[argname] = parse_type(argtype)
-        #
         w_restype = parse_type(res)
         return cls.make(w_restype=w_restype, **kwargs)
 

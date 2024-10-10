@@ -1,6 +1,5 @@
 from collections import defaultdict
-from typing import TYPE_CHECKING, Optional
-from spy.fqn import QN
+from typing import TYPE_CHECKING
 from spy.vm.object import W_Object
 from spy.vm.function import W_Func
 
@@ -34,8 +33,8 @@ class BlueCache:
 
     def lookup(self, w_func: W_Func, got_args_w: ARGS_W) -> W_Object | None:
         entries = self.data[w_func]
-        ## if w_func.qn == QN('operator::CALL_METHOD'):
-        ##     import pdb;pdb.set_trace()
+        # if w_func.qn == QN('operator::CALL_METHOD'):
+        # import pdb;pdb.set_trace()
         for args_w, w_result in entries:
             if self.args_w_eq(args_w, got_args_w):
                 return w_result

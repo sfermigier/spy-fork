@@ -1,6 +1,6 @@
-from typing import TYPE_CHECKING, Any, no_type_check, Optional
+from typing import TYPE_CHECKING
 from spy.fqn import QN
-from spy.vm.object import W_Object, spytype, W_Type, W_Dynamic, W_I32, W_Void, W_Bool
+from spy.vm.object import W_Object, spytype, W_Dynamic, W_I32
 from spy.vm.sig import spy_builtin
 from spy.vm.opimpl import W_OpImpl, W_Value
 

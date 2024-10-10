@@ -1,9 +1,7 @@
-from typing import Optional, TYPE_CHECKING, Any, Type
+from typing import TYPE_CHECKING, Any
 from collections.abc import Callable
-from dataclasses import dataclass
 from spy.ast import Color
 from spy.fqn import QN
-from spy.vm.function import W_FuncType, W_BuiltinFunc
 from spy.vm.sig import spy_builtin, SPyBuiltin
 from spy.vm.object import W_Object, spytype
 
@@ -94,5 +92,4 @@ class ModuleRegistry:
 
         if pyfunc is None:
             return decorator
-        else:
-            return decorator(pyfunc)
+        return decorator(pyfunc)

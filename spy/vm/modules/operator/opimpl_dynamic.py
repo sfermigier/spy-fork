@@ -1,10 +1,8 @@
-from typing import TYPE_CHECKING, Any
-from spy.errors import SPyTypeError
-from spy.vm.b import B
-from spy.vm.object import W_Dynamic, W_Type
+from typing import TYPE_CHECKING
+from spy.vm.object import W_Dynamic
 from spy.vm.str import W_Str
 from spy.vm.function import W_Func
-from spy.vm.opimpl import W_OpImpl, W_Value
+from spy.vm.opimpl import W_Value
 from . import OP
 
 if TYPE_CHECKING:

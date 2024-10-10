@@ -1,13 +1,10 @@
 from typing import TYPE_CHECKING
 from spy.vm.b import B
-from spy.vm.object import W_Object, W_Type, W_Dynamic
-from spy.vm.str import W_Str
 from spy.vm.opimpl import W_OpImpl, W_Value
 from spy.vm.list import W_List
 from spy.vm.function import W_DirectCall, W_FuncType, FuncParam
 
 from . import OP
-from .binop import MM
 
 if TYPE_CHECKING:
     from spy.vm.vm import SPyVM

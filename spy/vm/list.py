@@ -1,6 +1,6 @@
-from typing import TYPE_CHECKING, Any, no_type_check, Optional, Type, ClassVar
+from typing import TYPE_CHECKING, Any, no_type_check, Type, ClassVar
 from spy.fqn import QN
-from spy.vm.object import W_Object, spytype, W_Type, W_Dynamic, W_I32, W_Void, W_Bool
+from spy.vm.object import W_Object, spytype, W_Type, W_I32, W_Void, W_Bool
 from spy.vm.sig import spy_builtin
 
 if TYPE_CHECKING:
@@ -26,13 +26,12 @@ class Meta_W_List(type):
     def __getitem__(self, itemcls: type[W_Object]) -> "Type[W_List]":
         if itemcls in self.CACHE:
             return self.CACHE[itemcls]
-        else:
-            n = itemcls.__name__
-            msg = (
-                f"W_List[{n}] is not available. Make sure to build it by "
-                f"calling W_List.make_prebuilt({n}) at import time"
-            )
-            raise ValueError(msg)
+        n = itemcls.__name__
+        msg = (
+            f"W_List[{n}] is not available. Make sure to build it by "
+            f"calling W_List.make_prebuilt({n}) at import time"
+        )
+        raise ValueError(msg)
 
     def make_prebuilt(self, itemcls: type[W_Object]) -> None:
         assert issubclass(itemcls, W_Object)
@@ -172,8 +171,7 @@ def _make_W_List(w_T: W_Type) -> type[W_List]:
 
             if w_ltype is w_rtype:
                 return W_OpImpl.simple(vm.wrap_func(eq))
-            else:
-                return W_OpImpl.NULL
+            return W_OpImpl.NULL
 
     W_MyList.__name__ = W_MyList.__qualname__ = interp_name
     return W_MyList

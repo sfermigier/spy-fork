@@ -1,8 +1,7 @@
 import py
-from typing import Any, Optional
+from typing import Any
 from collections.abc import Iterable
 import itertools
-from dataclasses import dataclass
 from types import FunctionType
 import fixedint
 from spy.fqn import QN, FQN
@@ -13,7 +12,7 @@ from spy.vm.object import W_Object, W_Type, W_I32, W_F64, W_Bool, W_Dynamic
 from spy.vm.str import W_Str
 from spy.vm.b import B
 from spy.vm.sig import SPyBuiltin
-from spy.vm.function import W_FuncType, W_Func, W_ASTFunc, W_BuiltinFunc
+from spy.vm.function import W_Func, W_ASTFunc
 from spy.vm.module import W_Module
 from spy.vm.opimpl import W_OpImpl, W_Value, value_eq
 from spy.vm.registry import ModuleRegistry
@@ -154,8 +153,7 @@ class SPyVM:
         assert isinstance(fqn, FQN)
         if fqn.is_module():
             return self.modules_w.get(fqn.modname)
-        else:
-            return self.globals_w.get(fqn)
+        return self.globals_w.get(fqn)
 
     def reverse_lookup_global(self, w_val: W_Object) -> FQN | None:
         # XXX we should maintain a reverse-lookup table instead of doing a
@@ -189,7 +187,6 @@ class SPyVM:
             w_sub = w_sub.w_origintype
         if isinstance(w_super, W_TypeDef):
             w_super = w_super.w_origintype
-        #
         w_class = w_sub
         while w_class is not B.w_None:
             if w_class is w_super:
@@ -246,30 +243,27 @@ class SPyVM:
         T = type(value)
         if isinstance(value, W_Object):
             return value
-        elif value is None:
+        if value is None:
             return B.w_None
-        elif T in (int, fixedint.Int32):
+        if T in (int, fixedint.Int32):
             return W_I32(value)
-        elif T is float:
+        if T is float:
             return W_F64(value)
-        elif T is bool:
+        if T is bool:
             if value:
                 return B.w_True
-            else:
-                return B.w_False
-        elif T is str:
+            return B.w_False
+        if T is str:
             return W_Str(self, value)
-        elif isinstance(value, type) and issubclass(value, W_Object):
+        if (isinstance(value, type) and issubclass(value, W_Object)) or isinstance(value, SPyBuiltin):
             return value._w
-        elif isinstance(value, SPyBuiltin):
-            return value._w
-        elif isinstance(value, FunctionType):
+        if isinstance(value, FunctionType):
             raise Exception(
                 f"Cannot wrap interp-level function {value.__name__}. "
                 f"Did you forget `@spy_builtin`?"
             )
         raise Exception(
-            f"Cannot wrap interp-level objects " + f"of type {value.__class__.__name__}"
+            "Cannot wrap interp-level objects " + f"of type {value.__class__.__name__}"
         )
 
     def wrap_func(self, value: Any) -> W_Func:
@@ -310,9 +304,8 @@ class SPyVM:
             w_result = self._call_func(w_func, args_w)
             self.bluecache.record(w_func, args_w, w_result)
             return w_result
-        else:
-            # for red functions, we just call them
-            return self._call_func(w_func, args_w)
+        # for red functions, we just call them
+        return self._call_func(w_func, args_w)
 
     def call_OP(self, w_func: W_Func, args_wv: list[W_Value]) -> W_OpImpl:
         """

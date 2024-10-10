@@ -69,15 +69,15 @@ OPERATOR = OperatorRegistry("operator", "<operator>")
 OP = OPERATOR
 
 # the folloing imports register all the various objects on OP
-from . import opimpl_i32  # side effects
-from . import opimpl_f64  # side effects
-from . import opimpl_str  # side effects
-from . import opimpl_object  # side effects
-from . import opimpl_dynamic  # side effects
-from . import binop  # side effects
-from . import attrop  # side effects
-from . import itemop  # side effects
-from . import callop  # side effects
+from . import opimpl_i32 as opimpl_i32  # side effects
+from . import opimpl_f64 as opimpl_f64  # side effects
+from . import opimpl_str as opimpl_str  # side effects
+from . import opimpl_object as opimpl_object  # side effects
+from . import opimpl_dynamic as opimpl_dynamic  # side effects
+from . import binop as binop  # side effects
+from . import attrop as attrop  # side effects
+from . import itemop as itemop  # side effects
+from . import callop as callop  # side effects
 
 # fill the _from_token dict
 OP._from_token.update(

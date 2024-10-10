@@ -1,8 +1,8 @@
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 from collections.abc import Iterable
 from spy.fqn import QN, FQN
 from spy.vm.b import B
-from spy.vm.object import W_Object, spytype, W_Type, W_Dynamic, W_Void
+from spy.vm.object import W_Object, spytype, W_Dynamic, W_Void
 from spy.vm.str import W_Str
 from spy.vm.function import W_ASTFunc
 from spy.vm.sig import spy_builtin

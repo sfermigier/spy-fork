@@ -1,24 +1,17 @@
-from typing import TYPE_CHECKING, Any, Optional, NoReturn
+from typing import TYPE_CHECKING
 from types import NoneType
-from dataclasses import dataclass
 from spy import ast
-from spy.fqn import FQN, QN
-from spy.location import Loc
+from spy.fqn import QN
 from spy.errors import (
-    SPyRuntimeAbort,
     SPyTypeError,
-    SPyNameError,
     SPyRuntimeError,
-    maybe_plural,
 )
-from spy.irgen.symtable import Symbol, Color
 from spy.vm.b import B
 from spy.vm.object import W_Object, W_Type
 from spy.vm.function import W_Func, W_FuncType, W_ASTFunc, Namespace
 from spy.vm.list import W_List
 from spy.vm.tuple import W_Tuple
 from spy.vm.typechecker import TypeChecker
-from spy.vm.typeconverter import TypeConverter
 from spy.util import magic_dispatch
 
 if TYPE_CHECKING:
@@ -69,10 +62,9 @@ class ASTFrame:
             # None, else it's an error.
             if self.w_func.w_functype.w_restype in (B.w_void, B.w_dynamic):
                 return B.w_None
-            else:
-                loc = self.w_func.funcdef.loc.make_end_loc()
-                msg = "reached the end of the function without a `return`"
-                raise SPyTypeError.simple(msg, "no return", loc)
+            loc = self.w_func.funcdef.loc.make_end_loc()
+            msg = "reached the end of the function without a `return`"
+            raise SPyTypeError.simple(msg, "no return", loc)
 
         except Return as e:
             return e.w_value
@@ -101,9 +93,8 @@ class ASTFrame:
         w_val = magic_dispatch(self, "eval_expr", expr)
         if typeconv is None:
             return w_val
-        else:
-            # apply the type converter, if present
-            return typeconv.convert(self.vm, w_val)
+        # apply the type converter, if present
+        return typeconv.convert(self.vm, w_val)
 
     def eval_expr_type(self, expr: ast.Expr) -> W_Type:
         w_val = self.eval_expr(expr)
@@ -225,13 +216,12 @@ class ASTFrame:
                 w_value is not None
             ), f"{sym.fqn} not found. Bug in the ScopeAnalyzer?"
             return w_value
-        elif sym.is_local:
+        if sym.is_local:
             return self.load_local(name.id)
-        else:
-            namespace = self.w_func.closure[sym.level]
-            w_value = namespace[sym.name]
-            assert w_value is not None
-            return w_value
+        namespace = self.w_func.closure[sym.level]
+        w_value = namespace[sym.name]
+        assert w_value is not None
+        return w_value
 
     def eval_expr_BinOp(self, binop: ast.BinOp) -> W_Object:
         w_opimpl = self.t.opimpl[binop]
