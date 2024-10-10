@@ -7,7 +7,7 @@ from spy.textbuilder import ColorFormatter
 Level = Literal["error", "note"]
 
 
-def maybe_plural(n: int, singular: str, plural: Optional[str] = None) -> str:
+def maybe_plural(n: int, singular: str, plural: str | None = None) -> str:
     if n == 1:
         return singular
     elif plural is None:
@@ -20,7 +20,7 @@ def maybe_plural(n: int, singular: str, plural: Optional[str] = None) -> str:
 class Annotation:
     level: Level
     message: str
-    loc: Optional[Loc]
+    loc: Loc | None
 
     def get_src(self) -> str:
         """

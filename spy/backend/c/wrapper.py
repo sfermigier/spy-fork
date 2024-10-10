@@ -1,18 +1,18 @@
-import struct
-from typing import Any, Optional
+from typing import Any
+
 import py.path
 import wasmtime
+
 from spy.fqn import FQN
-from spy.llwasm import LLWasmType
 from spy.libspy import LLSPyInstance
-from spy.vm.object import W_Type
-from spy.vm.str import ll_spy_Str_new
-from spy.vm.module import W_Module
-from spy.vm.function import W_Func, W_FuncType
-from spy.vm.vm import SPyVM
+from spy.llwasm import LLWasmType
 from spy.vm.b import B
+from spy.vm.function import W_Func, W_FuncType
 from spy.vm.modules.rawbuffer import RB
 from spy.vm.modules.types import W_TypeDef
+from spy.vm.object import W_Type
+from spy.vm.str import ll_spy_Str_new
+from spy.vm.vm import SPyVM
 
 
 class WasmModuleWrapper:

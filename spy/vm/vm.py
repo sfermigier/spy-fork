@@ -1,5 +1,6 @@
 import py
-from typing import Any, Optional, Iterable
+from typing import Any, Optional
+from collections.abc import Iterable
 import itertools
 from dataclasses import dataclass
 from types import FunctionType
@@ -133,7 +134,7 @@ class SPyVM:
         self.unique_fqns.add(fqn)
         return fqn
 
-    def add_global(self, fqn: FQN, w_type: Optional[W_Type], w_value: W_Object) -> None:
+    def add_global(self, fqn: FQN, w_type: W_Type | None, w_value: W_Object) -> None:
         assert isinstance(fqn, FQN)
         assert fqn.modname in self.modules_w
         assert fqn not in self.globals_w
@@ -145,18 +146,18 @@ class SPyVM:
         self.globals_types[fqn] = w_type
         self.globals_w[fqn] = w_value
 
-    def lookup_global_type(self, fqn: FQN) -> Optional[W_Type]:
+    def lookup_global_type(self, fqn: FQN) -> W_Type | None:
         assert isinstance(fqn, FQN)
         return self.globals_types.get(fqn)
 
-    def lookup_global(self, fqn: FQN) -> Optional[W_Object]:
+    def lookup_global(self, fqn: FQN) -> W_Object | None:
         assert isinstance(fqn, FQN)
         if fqn.is_module():
             return self.modules_w.get(fqn.modname)
         else:
             return self.globals_w.get(fqn)
 
-    def reverse_lookup_global(self, w_val: W_Object) -> Optional[FQN]:
+    def reverse_lookup_global(self, w_val: W_Object) -> FQN | None:
         # XXX we should maintain a reverse-lookup table instead of doing a
         # linear search
         for fqn, w_obj in self.globals_w.items():

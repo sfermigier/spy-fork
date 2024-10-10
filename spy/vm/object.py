@@ -182,10 +182,10 @@ class W_Type(W_Object):
     """
 
     name: str
-    pyclass: Type[W_Object]
+    pyclass: type[W_Object]
     __spy_storage_category__ = "reference"
 
-    def __init__(self, name: str, pyclass: Type[W_Object]):
+    def __init__(self, name: str, pyclass: type[W_Object]):
         assert issubclass(pyclass, W_Object)
         self.name = name
         self.pyclass = pyclass
@@ -203,7 +203,7 @@ class W_Type(W_Object):
     def __repr__(self) -> str:
         return f"<spy type '{self.name}'>"
 
-    def spy_unwrap(self, vm: "SPyVM") -> Type[W_Object]:
+    def spy_unwrap(self, vm: "SPyVM") -> type[W_Object]:
         return self.pyclass
 
     def is_reference_type(self, vm: "SPyVM") -> bool:
@@ -278,7 +278,7 @@ class Member:
         self.name = name
 
 
-def _get_member_maybe(t: Any) -> Optional[Member]:
+def _get_member_maybe(t: Any) -> Member | None:
     """
     Return the Member instance found in the annotation metadata, if any.
     """
@@ -288,7 +288,7 @@ def _get_member_maybe(t: Any) -> Optional[Member]:
     return None
 
 
-def make_metaclass(name: str, pyclass: Type[W_Object]) -> Type[W_Type]:
+def make_metaclass(name: str, pyclass: type[W_Object]) -> type[W_Type]:
     """
     Synthesize an app-level metaclass for the corresponding interp-level
     pyclass.
@@ -348,7 +348,7 @@ def fix_annotations(fn: Any, types: dict[str, type]) -> None:
             fn.__annotations__[key] = newT
 
 
-def synthesize_meta_op_CALL(pyclass: Type[W_Object]) -> Any:
+def synthesize_meta_op_CALL(pyclass: type[W_Object]) -> Any:
     """
     Given a pyclass which implements spy_new, create an op_CALL for the
     corresponding metaclass. Example:
@@ -401,7 +401,7 @@ def spytype(name: str) -> Any:
     W_Type and attaches it to the W_* class.
     """
 
-    def decorator(pyclass: Type[W_Object]) -> Type[W_Object]:
+    def decorator(pyclass: type[W_Object]) -> type[W_Object]:
         W_MetaClass = make_metaclass(name, pyclass)
 
         pyclass._w = W_MetaClass(name, pyclass)

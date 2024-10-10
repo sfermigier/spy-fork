@@ -42,10 +42,10 @@ class QN:
 
     def __init__(
         self,
-        fullname: Optional[str] = None,
+        fullname: str | None = None,
         *,
-        modname: Optional[str] = None,
-        attr: Optional[str] = None,
+        modname: str | None = None,
+        attr: str | None = None,
     ) -> None:
         if fullname is None:
             assert modname is not None

@@ -1,5 +1,6 @@
 import typing
-from typing import Optional, Iterator, Any, Literal
+from typing import Optional, Any, Literal
+from collections.abc import Iterator
 import pprint
 import ast as py_ast
 import dataclasses
@@ -90,7 +91,7 @@ class Node:
     def replace(self, **kwargs: Any) -> Any:
         return dataclasses.replace(self, **kwargs)
 
-    def walk(self, cls: Optional[type] = None) -> Iterator["Node"]:
+    def walk(self, cls: type | None = None) -> Iterator["Node"]:
         if cls is None or isinstance(self, cls):
             yield self
         for node in self.get_children():

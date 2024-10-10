@@ -28,7 +28,7 @@ if TYPE_CHECKING:
 KeyType = tuple[str, Optional[W_Type], Optional[W_Type]]
 
 
-def parse_type(s: Optional[str]) -> Optional[W_Type]:
+def parse_type(s: str | None) -> W_Type | None:
     if s is None:
         return None
     w_res = getattr(B, f"w_{s}")
@@ -43,7 +43,7 @@ class MultiMethodTable:
         self.impls = {}
 
     def register(
-        self, op: str, ltype: Optional[str], rtype: Optional[str], w_func: W_Object
+        self, op: str, ltype: str | None, rtype: str | None, w_func: W_Object
     ) -> None:
         assert isinstance(w_func, W_Func)
         w_ltype = parse_type(ltype)

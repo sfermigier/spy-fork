@@ -1,4 +1,5 @@
-from typing import Any, Iterator, Optional
+from typing import Any, Optional
+from collections.abc import Iterator
 from contextlib import contextmanager
 import ast as py_ast
 import spy.ast
@@ -19,7 +20,7 @@ def dump(
 
 
 def pprint(
-    node: Any, *, copy_to_clipboard: bool = False, hl: Optional[spy.ast.Node] = None
+    node: Any, *, copy_to_clipboard: bool = False, hl: spy.ast.Node | None = None
 ) -> None:
     print(dump(node, hl=hl))
     if copy_to_clipboard:
@@ -36,7 +37,7 @@ class Dumper(TextBuilder):
         self,
         *,
         use_colors: bool,
-        highlight: Optional[spy.ast.Node] = None,
+        highlight: spy.ast.Node | None = None,
     ) -> None:
         super().__init__(use_colors=use_colors)
         self.highlight = highlight

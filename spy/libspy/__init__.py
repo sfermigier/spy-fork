@@ -15,7 +15,7 @@ LLMOD = LLWasmModule(LIBSPY_WASM)
 
 class LibSPyHost(HostModule):
     log: list[str]
-    panic_message: Optional[str]
+    panic_message: str | None
 
     def __init__(self) -> None:
         self.log = []

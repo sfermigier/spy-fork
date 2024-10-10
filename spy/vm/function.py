@@ -1,5 +1,6 @@
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Optional, Callable
+from typing import TYPE_CHECKING, Any, Optional
+from collections.abc import Callable
 from spy import ast
 from spy.ast import Color
 from spy.fqn import QN
@@ -159,7 +160,7 @@ class W_ASTFunc(W_Func):
     closure: tuple[Namespace, ...]
     # types of local variables: this is non-None IIF the function has been
     # redshifted.
-    locals_types_w: Optional[dict[str, W_Type]]
+    locals_types_w: dict[str, W_Type] | None
 
     def __init__(
         self,
@@ -168,7 +169,7 @@ class W_ASTFunc(W_Func):
         funcdef: ast.FuncDef,
         closure: tuple[Namespace, ...],
         *,
-        locals_types_w: Optional[dict[str, W_Type]] = None,
+        locals_types_w: dict[str, W_Type] | None = None,
     ) -> None:
         self.w_functype = w_functype
         self.qn = qn

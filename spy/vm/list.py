@@ -21,9 +21,9 @@ class Meta_W_List(type):
         make_list_type(vm, B.w_i32) is vm.wrap(W_List[W_I32])
     """
 
-    CACHE: ClassVar[dict[Type[W_Object], "Type[W_List]"]] = {}
+    CACHE: ClassVar[dict[type[W_Object], "Type[W_List]"]] = {}
 
-    def __getitem__(self, itemcls: Type[W_Object]) -> "Type[W_List]":
+    def __getitem__(self, itemcls: type[W_Object]) -> "Type[W_List]":
         if itemcls in self.CACHE:
             return self.CACHE[itemcls]
         else:
@@ -34,7 +34,7 @@ class Meta_W_List(type):
             )
             raise ValueError(msg)
 
-    def make_prebuilt(self, itemcls: Type[W_Object]) -> None:
+    def make_prebuilt(self, itemcls: type[W_Object]) -> None:
         assert issubclass(itemcls, W_Object)
         if itemcls not in self.CACHE:
             W_MyList = _make_W_List(itemcls._w)
@@ -62,7 +62,7 @@ class W_List(W_Object, metaclass=Meta_W_List):
     __spy_storage_category__ = "reference"
 
     @classmethod
-    def make_prebuilt(cls, itemcls: Type[W_Object]) -> None:
+    def make_prebuilt(cls, itemcls: type[W_Object]) -> None:
         """
         Just a shortcut to reach Meta_W_List more easily
         """
@@ -95,7 +95,7 @@ def make_list_type(vm: "SPyVM", w_list: W_Object, w_T: W_Type) -> W_Type:
     return vm.wrap(pyclass)  # type: ignore
 
 
-def _make_W_List(w_T: W_Type) -> Type[W_List]:
+def _make_W_List(w_T: W_Type) -> type[W_List]:
     """
     DON'T CALL THIS DIRECTLY!
     You should call make_list_type instead, which knows how to deal with

@@ -1,5 +1,6 @@
 import inspect
-from typing import TYPE_CHECKING, Any, Callable
+from typing import TYPE_CHECKING, Any
+from collections.abc import Callable
 from spy.fqn import QN
 from spy.ast import Color
 from spy.vm.object import W_Object, W_Type, W_Dynamic, w_DynamicType, W_Void

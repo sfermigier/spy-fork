@@ -32,7 +32,7 @@ class BlueCache:
         entry = (args_w, w_result)
         self.data[w_func].append(entry)
 
-    def lookup(self, w_func: W_Func, got_args_w: ARGS_W) -> Optional[W_Object]:
+    def lookup(self, w_func: W_Func, got_args_w: ARGS_W) -> W_Object | None:
         entries = self.data[w_func]
         ## if w_func.qn == QN('operator::CALL_METHOD'):
         ##     import pdb;pdb.set_trace()

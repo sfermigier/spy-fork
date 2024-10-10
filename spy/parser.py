@@ -47,7 +47,7 @@ class Parser:
     def error(self, primary: str, secondary: str, loc: Loc) -> NoReturn:
         raise SPyParseError.simple(primary, secondary, loc)
 
-    def unsupported(self, node: py_ast.AST, reason: Optional[str] = None) -> NoReturn:
+    def unsupported(self, node: py_ast.AST, reason: str | None = None) -> NoReturn:
         """
         Emit a nice error in case we encounter an unsupported AST node.
         """
@@ -268,7 +268,7 @@ class Parser:
 
     def from_py_AnnAssign(
         self, py_node: py_ast.AnnAssign, is_global: bool = False
-    ) -> tuple[spy.ast.VarDef, Optional[spy.ast.Assign]]:
+    ) -> tuple[spy.ast.VarDef, spy.ast.Assign | None]:
         if not py_node.simple:
             self.error(
                 f"not supported: assignments targets with parentheses",

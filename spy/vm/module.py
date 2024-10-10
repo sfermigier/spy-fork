@@ -1,4 +1,5 @@
-from typing import TYPE_CHECKING, Optional, Iterable
+from typing import TYPE_CHECKING, Optional
+from collections.abc import Iterable
 from spy.fqn import QN, FQN
 from spy.vm.b import B
 from spy.vm.object import W_Object, spytype, W_Type, W_Dynamic, W_Void
@@ -61,7 +62,7 @@ class W_Module(W_Object):
 
     # ==== public interp-level API ====
 
-    def getattr_maybe(self, attr: str) -> Optional[W_Object]:
+    def getattr_maybe(self, attr: str) -> W_Object | None:
         fqn = FQN.make_global(modname=self.name, attr=attr)
         return self.vm.lookup_global(fqn)
 

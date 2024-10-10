@@ -79,7 +79,7 @@ class ScopeAnalyzer:
         """
         return self.stack[-1]
 
-    def lookup(self, name: str) -> tuple[int, Optional[Symbol]]:
+    def lookup(self, name: str) -> tuple[int, Symbol | None]:
         """
         Lookup a name, starting from the innermost scope, towards the outer.
         """
@@ -96,7 +96,7 @@ class ScopeAnalyzer:
         loc: Loc,
         type_loc: Loc,
         *,
-        fqn: Optional[FQN] = None,
+        fqn: FQN | None = None,
     ) -> None:
         """
         Add a name to the current scope.

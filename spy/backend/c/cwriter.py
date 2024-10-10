@@ -1,20 +1,21 @@
-from typing import Optional, Any
-from types import NoneType
 import itertools
+from types import NoneType
+
 import py.path
+
 from spy import ast
+from spy.backend.c import c_ast as C
+from spy.backend.c.context import Context
 from spy.fqn import FQN
 from spy.location import Loc
-from spy.vm.object import W_Type, W_Object
-from spy.vm.module import W_Module
-from spy.vm.function import W_ASTFunc, W_BuiltinFunc, W_FuncType, W_Func
-from spy.vm.vm import SPyVM
-from spy.vm.b import B
-from spy.vm.modules.types import TYPES
 from spy.textbuilder import TextBuilder
-from spy.backend.c.context import Context, C_Type, C_Function
-from spy.backend.c import c_ast as C
 from spy.util import shortrepr, magic_dispatch
+from spy.vm.b import B
+from spy.vm.function import W_ASTFunc, W_Func
+from spy.vm.module import W_Module
+from spy.vm.modules.types import TYPES
+from spy.vm.object import W_Object
+from spy.vm.vm import SPyVM
 
 
 class CModuleWriter:
@@ -64,16 +65,16 @@ class CModuleWriter:
     def emit_module(self) -> str:
         self.out.wb(
             f"""
-        #include <spy.h>
+            #include <spy.h>
 
-        #ifdef SPY_DEBUG_C
-        #    define SPY_LINE(SPY, C) C "{self.cfile}"
-        #else
-        #    define SPY_LINE(SPY, C) SPY "{self.spyfile}"
-        #endif
+            #ifdef SPY_DEBUG_C
+            #    define SPY_LINE(SPY, C) C "{self.cfile}"
+            #else
+            #    define SPY_LINE(SPY, C) SPY "{self.spyfile}"
+            #endif
 
-        // global declarations and definitions
-        """
+            // global declarations and definitions
+            """
         )
         self.out_warnings = self.out.make_nested_builder()
         self.out_globals = self.out.make_nested_builder()
@@ -401,7 +402,7 @@ class CFuncWriter:
         op = self.FQN2BinOp.get(call.func.fqn)
         if op is not None:
             assert len(call.args) == 2
-            l, r = [self.fmt_expr(arg) for arg in call.args]
+            l, r = (self.fmt_expr(arg) for arg in call.args)
             return C.BinOp(op, l, r)
 
         if call.func.fqn.modname == "jsffi" and self.cmod.target != "emscripten":

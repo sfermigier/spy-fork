@@ -1,4 +1,5 @@
-from typing import Callable, Optional, TYPE_CHECKING, Any, Type
+from typing import Optional, TYPE_CHECKING, Any, Type
+from collections.abc import Callable
 from dataclasses import dataclass
 from spy.ast import Color
 from spy.fqn import QN
@@ -60,7 +61,7 @@ class ModuleRegistry:
             MOD.add('Foo', W_Foo._w)
         """
 
-        def decorator(pyclass: Type[W_Object]) -> Type[W_Object]:
+        def decorator(pyclass: type[W_Object]) -> type[W_Object]:
             W_class = spytype(name)(pyclass)
             self.add(name, W_class._w)
             return W_class
@@ -68,7 +69,7 @@ class ModuleRegistry:
         return decorator
 
     def builtin(
-        self, pyfunc: Optional[Callable] = None, *, color: Color = "red"
+        self, pyfunc: Callable | None = None, *, color: Color = "red"
     ) -> Any:
         """
         Register a builtin function on the module. We support two different

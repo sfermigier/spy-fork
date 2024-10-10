@@ -215,7 +215,7 @@ class SPyBackend:
         FQN.parse("operator::f64_ge"): ast.GtE,
     }
 
-    def get_binop_maybe(self, func: ast.Expr) -> Optional[type[ast.BinOp]]:
+    def get_binop_maybe(self, func: ast.Expr) -> type[ast.BinOp] | None:
         """
         Some opimpl are special-cased and turned back into a BinOp
         """

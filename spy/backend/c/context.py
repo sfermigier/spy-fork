@@ -39,7 +39,7 @@ class C_Function:
         return f"<C func '{self.name}'>"
 
     def decl(self) -> str:
-        if self.params == []:
+        if not self.params:
             s_params = "void"
         else:
             paramlist = [f"{p.c_type} {p.name}" for p in self.params]
@@ -60,14 +60,15 @@ class Context:
 
     def __init__(self, vm: SPyVM) -> None:
         self.vm = vm
-        self._d = {}
-        self._d[B.w_void] = C_Type("void")
-        self._d[B.w_i32] = C_Type("int32_t")
-        self._d[B.w_f64] = C_Type("double")
-        self._d[B.w_bool] = C_Type("bool")
-        self._d[B.w_str] = C_Type("spy_Str *")
-        self._d[RB.w_RawBuffer] = C_Type("spy_RawBuffer *")
-        self._d[JSFFI.w_JsRef] = C_Type("JsRef")
+        self._d = {
+            B.w_void: C_Type("void"),
+            B.w_i32: C_Type("int32_t"),
+            B.w_f64: C_Type("double"),
+            B.w_bool: C_Type("bool"),
+            B.w_str: C_Type("spy_Str *"),
+            RB.w_RawBuffer: C_Type("spy_RawBuffer *"),
+            JSFFI.w_JsRef: C_Type("JsRef"),
+        }
 
     def w2c(self, w_type: W_Type) -> C_Type:
         if isinstance(w_type, W_TypeDef):

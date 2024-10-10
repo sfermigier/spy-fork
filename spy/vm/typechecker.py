@@ -1,4 +1,5 @@
-from typing import TYPE_CHECKING, Optional, NoReturn, Any, Sequence, Literal
+from typing import TYPE_CHECKING, Optional, NoReturn, Any, Literal
+from collections.abc import Sequence
 from types import NoneType
 from spy import ast
 from spy.fqn import QN, FQN
@@ -109,7 +110,7 @@ class TypeChecker:
             err.add("note", msg, expr.loc)
             raise
 
-    def name2sym_maybe(self, expr: ast.Expr) -> Optional[Symbol]:
+    def name2sym_maybe(self, expr: ast.Expr) -> Symbol | None:
         """
         If expr is an ast.Name, return the corresponding Symbol.
         Else, return None.
@@ -495,8 +496,8 @@ def _call_error_wrong_argcount(
     exp: int,
     args_wv: list[W_Value],
     *,
-    def_loc: Optional[Loc],
-    call_loc: Optional[Loc],
+    def_loc: Loc | None,
+    call_loc: Loc | None,
 ) -> NoReturn:
     assert got != exp
     takes = maybe_plural(exp, f"takes {exp} argument")
@@ -529,7 +530,7 @@ def _call_error_wrong_argcount(
 
 def convert_type_maybe(
     vm: "SPyVM", wv_x: W_Value, w_exp: W_Type
-) -> Optional[TypeConverter]:
+) -> TypeConverter | None:
     """
     Check whether the given W_Value is compatible with the expected type:
 

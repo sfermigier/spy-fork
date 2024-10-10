@@ -1,4 +1,5 @@
-from typing import Optional, Iterator, Union
+from typing import Optional, Union
+from collections.abc import Iterator
 import textwrap
 from contextlib import contextmanager
 
@@ -49,7 +50,7 @@ class TextBuilder:
         self.lines.append("")
         return nested
 
-    def write(self, s: str, *, color: Optional[str] = None) -> None:
+    def write(self, s: str, *, color: str | None = None) -> None:
         assert "\n" not in s
         assert isinstance(self.lines[-1], str)
         s = self.color.set(color, s)
@@ -59,11 +60,11 @@ class TextBuilder:
             self.lines[-1] = spaces
         self.lines[-1] += s
 
-    def writeline(self, s: str = "", *, color: Optional[str] = None) -> None:
+    def writeline(self, s: str = "", *, color: str | None = None) -> None:
         self.write(s, color=color)
         self.lines.append("")
 
-    def writeblock(self, s: str, *, color: Optional[str] = None) -> None:
+    def writeblock(self, s: str, *, color: str | None = None) -> None:
         s = textwrap.dedent(s).strip()
         for line in s.splitlines():
             self.writeline(line, color=color)
@@ -111,14 +112,14 @@ class ColorFormatter:
     def __init__(self, use_colors: bool) -> None:
         self._use_colors = use_colors
 
-    def set(self, color: Optional[str], s: str) -> str:
+    def set(self, color: str | None, s: str) -> str:
         if color is None or not self._use_colors:
             return s
         try:
             color = getattr(self, color)
         except AttributeError:
             pass
-        return "\x1b[%sm%s\x1b[00m" % (color, s)
+        return "\x1b[{}m{}\x1b[00m".format(color, s)
 
 
 # create a global instance, so that you can just do Color.set('red', ....)

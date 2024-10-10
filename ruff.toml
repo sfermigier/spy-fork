@@ -18,8 +18,12 @@ lint.extend-ignore = [
      "S101",
     # Later...
     "N801",
+    "N802",
+    "N806",
     "A",
     "FIX002",
     "TD",
     "PLR6301",
+    "PLR2004",
+    "FBT003",
 ]

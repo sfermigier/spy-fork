@@ -47,8 +47,8 @@ def get_linker(
     store: wt.Store,
     llmod: LLWasmModule,
     *,
-    wasi_config: Optional[wt.WasiConfig] = None,
-    hostmods: Optional[list[HostModule]] = None,
+    wasi_config: wt.WasiConfig | None = None,
+    hostmods: list[HostModule] | None = None,
 ) -> wt.Linker:
     """
     Setup a Linker which can be used to instantiate llmod.
@@ -177,7 +177,7 @@ class LLWasmInstance:
         Produces the following WASM:
             (global $a i32 (i32.const 1024))
             (global $b i32 (i32.const 1026))
-            (data $d0 (i32.const 1024) "\aa\aa\bb\bb\cc\cc")
+            (data $d0 (i32.const 1024) "\aa\aa\bb\bb\\cc\\cc")
 
         In this case:
             read_global('a', deref=None) == 1024

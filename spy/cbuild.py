@@ -55,8 +55,8 @@ class Toolchain:
         *,
         opt_level: int = 0,
         debug_symbols: bool = False,
-        EXTRA_CFLAGS: Optional[list[str]] = None,
-        EXTRA_LDFLAGS: Optional[list[str]] = None,
+        EXTRA_CFLAGS: list[str] | None = None,
+        EXTRA_LDFLAGS: list[str] | None = None,
     ) -> py.path.local:
         EXTRA_CFLAGS = EXTRA_CFLAGS or []
         EXTRA_LDFLAGS = EXTRA_LDFLAGS or []
@@ -82,7 +82,7 @@ class Toolchain:
         file_c: py.path.local,
         file_wasm: py.path.local,
         *,
-        exports: Optional[list[str]] = None,
+        exports: list[str] | None = None,
         opt_level: int = 0,
         debug_symbols: bool = False,
     ) -> py.path.local:

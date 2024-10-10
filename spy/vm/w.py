@@ -18,3 +18,23 @@ from spy.vm.object import (
 from spy.vm.str import W_Str
 from spy.vm.list import W_List
 from spy.vm.opimpl import W_OpImpl
+
+__all__ = [
+    "W_Func",
+    "W_FuncType",
+    "W_ASTFunc",
+    "W_BuiltinFunc",
+    "spy_builtin",
+    "W_Module",
+    "W_Bool",
+    "W_F64",
+    "W_I32",
+    "W_Object",
+    "W_Type",
+    "W_Void",
+    "W_Dynamic",
+    "spytype",
+    "W_Str",
+    "W_List",
+    "W_OpImpl",
+]

@@ -30,7 +30,7 @@ class Symbol:
     #   * 1: module-level scope
     #   * 2: builtins
     level: int
-    fqn: Optional[FQN] = None
+    fqn: FQN | None = None
 
     def replace(self, **kwargs: Any) -> "Symbol":
         return replace(self, **kwargs)
@@ -85,7 +85,7 @@ class SymTable:
     def lookup(self, name: str) -> Symbol:
         return self._symbols[name]
 
-    def lookup_maybe(self, name: str) -> Optional[Symbol]:
+    def lookup_maybe(self, name: str) -> Symbol | None:
         return self._symbols.get(name)
 
     def __contains__(self, name: str) -> bool:

@@ -34,19 +34,19 @@ class W_Value(W_Object):
     prefix: str
     i: int
     w_static_type: Annotated[W_Type, Member("static_type")]
-    loc: Optional[Loc]
-    sym: Optional[Symbol]
-    _w_blueval: Optional[W_Object]
+    loc: Loc | None
+    sym: Symbol | None
+    _w_blueval: W_Object | None
 
     def __init__(
         self,
         prefix: str,
         i: int,
         w_static_type: W_Type,
-        loc: Optional[Loc],
+        loc: Loc | None,
         *,
-        sym: Optional[Symbol] = None,
-        w_blueval: Optional[W_Object] = None,
+        sym: Symbol | None = None,
+        w_blueval: W_Object | None = None,
     ) -> None:
         self.prefix = prefix
         self.i = i
@@ -141,9 +141,9 @@ def value_eq(vm: "SPyVM", wv1: W_Value, wv2: W_Value) -> W_Bool:
 @spytype("OpImpl")
 class W_OpImpl(W_Object):
     NULL: ClassVar["W_OpImpl"]
-    _w_func: Optional[W_Func]
-    _args_wv: Optional[list[W_Value]]
-    _converters: Optional[list[Optional["TypeConverter"]]]
+    _w_func: W_Func | None
+    _args_wv: list[W_Value] | None
+    _converters: list[Optional["TypeConverter"]] | None
 
     def __init__(self, *args) -> None:
         raise NotImplementedError("Please use W_OpImpl.simple()")
