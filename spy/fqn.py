@@ -33,7 +33,7 @@ fn_f64 = make_fn(f64)  # QN is 'test::fn', FQN is 'test::fn#2'
 See also SPyVM.get_FQN().
 """
 
-from typing import Optional, Any
+from typing import Any
 
 
 class QN:
@@ -55,7 +55,6 @@ class QN:
             assert attr is None
             assert fullname.count("::") == 1
             modname, attr = fullname.split("::")
-        #
         self.modname = modname
         self.attr = attr
 
@@ -65,7 +64,7 @@ class QN:
     def __str__(self) -> str:
         return self.fullname
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, QN):
             return NotImplemented
         return self.fullname == other.fullname
@@ -85,7 +84,7 @@ class FQN:
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         raise ValueError(
-            "You cannot instantiate an FQN directly. " "Please use vm.get_FQN()"
+            "You cannot instantiate an FQN directly. Please use vm.get_FQN()"
         )
 
     @classmethod
@@ -114,7 +113,6 @@ class FQN:
         else:
             qn = s
             suffix = ""
-        #
         assert qn.count("::") == 1
         modname, attr = qn.split("::")
         return FQN.make(modname=modname, attr=attr, suffix=suffix)
@@ -132,7 +130,7 @@ class FQN:
     def __str__(self) -> str:
         return self.fullname
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, FQN):
             return NotImplemented
         return self.fullname == other.fullname

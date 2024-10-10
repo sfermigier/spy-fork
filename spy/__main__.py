@@ -10,7 +10,7 @@ from spy.compiler import Compiler, ToolchainType
 from spy.cbuild import get_toolchain
 from spy.vm.b import B
 from spy.vm.vm import SPyVM
-from spy.vm.function import W_ASTFunc, W_Func, W_FuncType
+from spy.vm.function import W_Func, W_FuncType
 
 app = typer.Typer(pretty_exceptions_enable=False)
 
@@ -24,7 +24,6 @@ def boolopt(help: str, names: tuple[str, ...] = ()) -> Any:
 
 
 def do_pyparse(filename: str) -> None:
-    import ast as py_ast
 
     with open(filename) as f:
         src = f.read()

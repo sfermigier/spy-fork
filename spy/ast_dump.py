@@ -1,9 +1,7 @@
-from typing import Any, Optional
-from collections.abc import Iterator
-from contextlib import contextmanager
+from typing import Any
 import ast as py_ast
 import spy.ast
-from spy.textbuilder import TextBuilder, ColorFormatter
+from spy.textbuilder import TextBuilder
 
 
 def dump(
@@ -78,7 +76,6 @@ class Dumper(TextBuilder):
         values = [getattr(node, field) for field in fields]
         is_complex_field = [is_complex(value) for value in values]
         multiline = any(is_complex_field)
-        #
         if node is self.highlight:
             color = "red"
         self.write(name, color=color)

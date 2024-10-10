@@ -1,5 +1,4 @@
 import typing
-from typing import Optional
 import difflib
 from spy.textbuilder import Color
 
@@ -10,7 +9,7 @@ class AnythingClass:
     in which you don't care about the exact value of a specific field.
     """
 
-    def __eq__(self, other: typing.Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         return True
 
 

@@ -1,6 +1,5 @@
 import dataclasses
 from dataclasses import dataclass
-import linecache
 
 
 @dataclass
@@ -50,8 +49,7 @@ class Loc:
         c2 = self.col_end
         if l1 == l2 == c1 == c2 == 0:
             return f"<Loc: '{self.filename}'>"
-        else:
-            return f"<Loc: '{self.filename} {l1}:{c1} {l2}:{c2}'>"
+        return f"<Loc: '{self.filename} {l1}:{c1} {l2}:{c2}'>"
 
     def pp(self) -> None:
         """

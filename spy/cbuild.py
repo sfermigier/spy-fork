@@ -1,4 +1,3 @@
-from typing import Optional
 import subprocess
 import py.path
 import spy.libspy
@@ -7,14 +6,13 @@ import spy.libspy
 def get_toolchain(toolchain: str) -> "Toolchain":
     if toolchain == "zig":
         return ZigToolchain()
-    elif toolchain == "clang":
+    if toolchain == "clang":
         return ClangToolchain()
-    elif toolchain == "emscripten":
+    if toolchain == "emscripten":
         return EmscriptenToolchain()
-    elif toolchain == "native":
+    if toolchain == "native":
         return NativeToolchain()
-    else:
-        raise ValueError(f"Unknown toolchain: {toolchain}")
+    raise ValueError(f"Unknown toolchain: {toolchain}")
 
 
 class Toolchain:
@@ -34,7 +32,7 @@ class Toolchain:
             "--std=c99",
             "-Werror=implicit-function-declaration",
             "-Wfatal-errors",
-            #'-Werror',
+            # '-Werror',
             "-I",
             str(spy.libspy.INCLUDE),
         ]
@@ -67,7 +65,7 @@ class Toolchain:
         cmdline += ["-o", str(file_out), str(file_c)]
         cmdline += self.LDFLAGS + EXTRA_LDFLAGS
         # print(' '.join(cmdline))
-        proc = subprocess.run(cmdline, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        proc = subprocess.run(cmdline, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, check=False)
         if proc.returncode != 0:
             lines = ["Compilation failed!"]
             lines.append(" ".join(cmdline))

@@ -11,7 +11,7 @@ It is called 'LL' for two reasons:
     been very confusing :)
 """
 
-from typing import Any, Optional, Literal
+from typing import Any, Literal
 from typing_extensions import Self
 import py.path
 import wasmtime as wt
@@ -191,12 +191,11 @@ class LLWasmInstance:
         assert isinstance(addr, int)
         if deref is None:
             return addr
-        elif deref == "int32_t" or deref == "void *":
+        if deref == "int32_t" or deref == "void *":
             return self.mem.read_i32(addr)
-        elif deref == "int16_t":
+        if deref == "int16_t":
             return self.mem.read_i16(addr)
-        else:
-            assert False, f"Unknown type: {deref}"
+        assert False, f"Unknown type: {deref}"
 
 
 class LLWasmMemory:

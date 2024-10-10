@@ -1,5 +1,4 @@
-from typing import Any, Optional, TYPE_CHECKING
-from types import NoneType
+from typing import TYPE_CHECKING
 from fixedint import FixedInt
 from spy import ast
 from spy.location import Loc
@@ -39,7 +38,6 @@ class FuncDoppler:
         for stmt in funcdef.body:
             new_body += self.shift_stmt(stmt)
         new_funcdef = funcdef.replace(body=new_body)
-        #
         new_qn = self.w_func.qn
         # all the non-local lookups are redshifted into constants, so the
         # closure will be empty
@@ -132,8 +130,7 @@ class FuncDoppler:
         if sym.color == "red":
             newvalue = self.shift_expr(assign.value)
             return [assign.replace(value=newvalue)]
-        else:
-            assert False, "implement me"
+        assert False, "implement me"
 
     def shift_stmt_SetAttr(self, node: ast.SetAttr) -> list[ast.Stmt]:
         v_target = self.shift_expr(node.target)
@@ -220,8 +217,7 @@ class FuncDoppler:
             assert isinstance(newfunc, (ast.FQNConst, ast.Constant))
             newop = ast.Call(call.loc, newfunc, newargs)
             return self.specialize_print_maybe(newop)
-        else:
-            return self.shift_opimpl(call, w_opimpl, [newfunc] + newargs)
+        return self.shift_opimpl(call, w_opimpl, [newfunc] + newargs)
 
     def specialize_print_maybe(self, call: ast.Call) -> ast.Expr:
         """

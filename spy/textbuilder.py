@@ -1,4 +1,4 @@
-from typing import Optional, Union
+from typing import Union
 from collections.abc import Iterator
 import textwrap
 from contextlib import contextmanager
@@ -42,7 +42,7 @@ class TextBuilder:
         """
         if self.lines[-1] != "":
             raise ValueError(
-                "make_nested_builder can be called only " "after a newline"
+                "make_nested_builder can be called only after a newline"
             )
         nested = TextBuilder(use_colors=self.use_colors)
         nested.level = self.level
@@ -81,10 +81,9 @@ class TextBuilder:
                 line = line.build()
                 if line == "":
                     continue  # nothing to do
-                else:
-                    assert line.endswith("\n")
-                    line = line[:-1]
-                    strlines.append(line)
+                assert line.endswith("\n")
+                line = line[:-1]
+                strlines.append(line)
             else:
                 strlines.append(line)
         return "\n".join(strlines)

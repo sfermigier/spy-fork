@@ -44,12 +44,10 @@ class Compiler:
         file_spy = py.path.local(self.w_mod.filepath)
         self.cwriter = CModuleWriter(self.vm, self.w_mod, file_spy, self.file_c, target)
         self.cwriter.write_c_source()
-        #
         if DUMP_C:
             print()
             print(f"---- {self.file_c} ----")
             print(self.file_c.read())
-        #
         return self.file_c
 
     def cbuild(
@@ -74,8 +72,8 @@ class Compiler:
                 fqn.c_name
                 for fqn, w_obj in self.w_mod.items_w()
                 if (
-                    isinstance(w_obj, W_ASTFunc)
-                    and w_obj.color == "red"
+                    (isinstance(w_obj, W_ASTFunc)
+                    and w_obj.color == "red")
                     or isinstance(w_obj, W_I32)
                 )
             ]
@@ -91,9 +89,8 @@ class Compiler:
                 print(f"---- {self.file_wasm} ----")
                 os.system(f"wasm2wat {file_wasm}")
             return file_wasm
-        else:
-            file_exe = self.file_wasm.new(ext=toolchain.EXE_FILENAME_EXT)
-            toolchain.c2exe(
-                file_c, file_exe, opt_level=opt_level, debug_symbols=debug_symbols
-            )
-            return file_exe
+        file_exe = self.file_wasm.new(ext=toolchain.EXE_FILENAME_EXT)
+        toolchain.c2exe(
+            file_c, file_exe, opt_level=opt_level, debug_symbols=debug_symbols
+        )
+        return file_exe

@@ -1,4 +1,4 @@
-from typing import Optional, Literal
+from typing import Literal
 from dataclasses import dataclass
 import linecache
 from spy.location import Loc
@@ -10,10 +10,9 @@ Level = Literal["error", "note"]
 def maybe_plural(n: int, singular: str, plural: str | None = None) -> str:
     if n == 1:
         return singular
-    elif plural is None:
+    if plural is None:
         return singular + "s"
-    else:
-        return plural
+    return plural
 
 
 @dataclass

@@ -1,12 +1,11 @@
-from typing import Optional, NoReturn, Any
+from typing import NoReturn, Any
 from types import NoneType
-import textwrap
 import ast as py_ast
 import spy.ast
 from spy.magic_py_parse import magic_py_parse
 from spy.fqn import FQN
 from spy.location import Loc
-from spy.errors import SPyError, SPyParseError
+from spy.errors import SPyParseError
 from spy.util import magic_dispatch
 
 
@@ -82,7 +81,6 @@ class Parser:
                     "only function and variable definitions are allowed at global scope"
                 )
                 self.error(msg, "this is not allowed here", py_stmt.loc)
-        #
         return mod
 
     def from_py_stmt_FunctionDef(
@@ -100,11 +98,9 @@ class Parser:
                     "this is not supported",
                     deco.loc,
                 )
-        #
         loc = py_funcdef.loc
         name = py_funcdef.name
         args = self.from_py_arguments(color, py_funcdef.args)
-        #
         py_returns = py_funcdef.returns
         if py_returns:
             return_type = self.from_py_expr(py_returns)
@@ -118,7 +114,6 @@ class Parser:
                 line_end=loc.line_start, col_end=len("def ") + len(name)
             )
             self.error("missing return type", "", func_loc)
-        #
         body = self.from_py_body(py_funcdef.body)
         return spy.ast.FuncDef(
             loc=py_funcdef.loc,
@@ -163,7 +158,6 @@ class Parser:
                 py_args.kwonlyargs[0].loc,
             )
         assert not py_args.kw_defaults
-        #
         return [self.from_py_arg(color, py_arg) for py_arg in py_args.args]
 
     def from_py_arg(self, color: spy.ast.Color, py_arg: py_ast.arg) -> spy.ast.FuncArg:
@@ -177,7 +171,6 @@ class Parser:
                 "type is missing here",
                 py_arg.loc,
             )
-        #
         return spy.ast.FuncArg(
             loc=py_arg.loc,
             name=py_arg.arg,
@@ -271,7 +264,7 @@ class Parser:
     ) -> tuple[spy.ast.VarDef, spy.ast.Assign | None]:
         if not py_node.simple:
             self.error(
-                f"not supported: assignments targets with parentheses",
+                "not supported: assignments targets with parentheses",
                 "this is not supported",
                 py_node.target.loc,
             )
@@ -322,7 +315,7 @@ class Parser:
                 target=py_target.id,
                 value=self.from_py_expr(py_node.value),
             )
-        elif isinstance(py_target, py_ast.Attribute):
+        if isinstance(py_target, py_ast.Attribute):
             return spy.ast.SetAttr(
                 loc=py_node.loc,
                 target_loc=py_target.value.loc,
@@ -330,7 +323,7 @@ class Parser:
                 attr=py_target.attr,
                 value=self.from_py_expr(py_node.value),
             )
-        elif isinstance(py_target, py_ast.Subscript):
+        if isinstance(py_target, py_ast.Subscript):
             return spy.ast.SetItem(
                 loc=py_node.loc,
                 target_loc=py_target.value.loc,
@@ -338,7 +331,7 @@ class Parser:
                 index=self.from_py_expr(py_target.slice),
                 value=self.from_py_expr(py_node.value),
             )
-        elif isinstance(py_target, py_ast.Tuple):
+        if isinstance(py_target, py_ast.Tuple):
             targets = []
             target_locs = []
             for item in py_target.elts:
@@ -351,8 +344,7 @@ class Parser:
                 targets=targets,
                 value=self.from_py_expr(py_node.value),
             )
-        else:
-            self.unsupported(py_target, "assign to complex expressions")
+        self.unsupported(py_target, "assign to complex expressions")
 
     def from_py_stmt_If(self, py_node: py_ast.If) -> spy.ast.If:
         return spy.ast.If(
@@ -389,10 +381,10 @@ class Parser:
         T = type(py_node.value)
         if T in (int, float, bool, str, NoneType):
             return spy.ast.Constant(py_node.loc, py_node.value)
-        elif T in (bytes, float, complex, Ellipsis):
+        if T in (bytes, float, complex, Ellipsis):
             self.error(
                 f"unsupported literal: {py_node.value!r}",
-                f"this is not supported yet",
+                "this is not supported yet",
                 py_node.loc,
             )
         else:
@@ -452,7 +444,6 @@ class Parser:
             spy_cls = spy.ast.Not
         else:
             assert False, f"Unkown operator: {opname}"
-        #
         return spy_cls(py_node.loc, value)
 
     def from_py_expr_Compare(self, py_node: py_ast.Compare) -> spy.ast.BinOp:
@@ -477,5 +468,4 @@ class Parser:
             return spy.ast.CallMethod(
                 loc=py_node.loc, target=func.value, method=func.attr, args=args
             )
-        else:
-            return spy.ast.Call(loc=py_node.loc, func=func, args=args)
+        return spy.ast.Call(loc=py_node.loc, func=func, args=args)
