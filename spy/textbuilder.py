@@ -119,7 +119,7 @@ class ColorFormatter:
             color = getattr(self, color)
         except AttributeError:
             pass
-        return "\x1b[{}m{}\x1b[00m".format(color, s)
+        return f"\x1b[{color}m{s}\x1b[00m"
 
 
 # create a global instance, so that you can just do Color.set('red', ....)

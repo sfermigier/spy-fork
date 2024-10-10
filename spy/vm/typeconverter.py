@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import TYPE_CHECKING, ClassVar
 from dataclasses import dataclass
 from spy import ast
@@ -19,7 +21,7 @@ class TypeConverter:
     color: ClassVar[str] = None  # type: ignore # must be set by subclasses
     w_type: W_Type  # the desired type after the conversion
 
-    def convert(self, vm: "SPyVM", w_obj: W_Object) -> W_Object:
+    def convert(self, vm: SPyVM, w_obj: W_Object) -> W_Object:
         """
         Convert w_obj to the desired type.
 
@@ -28,7 +30,7 @@ class TypeConverter:
         """
         raise NotImplementedError
 
-    def redshift(self, vm: "SPyVM", expr: ast.Expr) -> ast.Expr:
+    def redshift(self, vm: SPyVM, expr: ast.Expr) -> ast.Expr:
         return expr
 
 
@@ -40,7 +42,7 @@ class DynamicCast(TypeConverter):
 
     color = "blue"
 
-    def convert(self, vm: "SPyVM", w_obj: W_Object) -> W_Object:
+    def convert(self, vm: SPyVM, w_obj: W_Object) -> W_Object:
         vm.typecheck(w_obj, self.w_type)
         return w_obj
 
@@ -57,7 +59,7 @@ class NumericConv(TypeConverter):
     color = "blue"
     w_fromtype: W_Type
 
-    def convert(self, vm: "SPyVM", w_obj: W_Object) -> W_Object:
+    def convert(self, vm: SPyVM, w_obj: W_Object) -> W_Object:
         assert self.w_type is B.w_f64
         assert self.w_fromtype is B.w_i32
         val = vm.unwrap_i32(w_obj)
@@ -69,10 +71,10 @@ class JsRefConv(TypeConverter):
     color = "red"
     w_fromtype: W_Type
 
-    def convert(self, vm: "SPyVM", w_obj: W_Object) -> W_Object:
+    def convert(self, vm: SPyVM, w_obj: W_Object) -> W_Object:
         raise NotImplementedError("only C backend so far")
 
-    def redshift(self, vm: "SPyVM", expr: ast.Expr) -> ast.Expr:
+    def redshift(self, vm: SPyVM, expr: ast.Expr) -> ast.Expr:
         if self.w_fromtype is B.w_str:
             f = "jsffi::js_string"
         elif self.w_fromtype is B.w_i32:
