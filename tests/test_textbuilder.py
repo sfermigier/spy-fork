@@ -114,7 +114,7 @@ class TestTextBuilder:
         outer.w("begin")
         with pytest.raises(
             ValueError,
-            match="make_nested_builder can be " "called only after a newline",
+            match="make_nested_builder can be called only after a newline",
         ):
             inner = outer.make_nested_builder()
 
@@ -161,7 +161,6 @@ class TestColorFormatter:
     def test_ColorFormatter(self):
         fmt = ColorFormatter(use_colors=False)
         assert fmt.set("red", "hello") == "hello"
-        #
         fmt = ColorFormatter(use_colors=True)
         assert fmt.set("red", "hello") == "\x1b[31;01mhello\x1b[00m"
         assert fmt.set(None, "hello") == "hello"

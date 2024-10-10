@@ -1,4 +1,3 @@
-import pytest
 from spy.fqn import FQN
 from spy.vm.vm import SPyVM
 from spy.vm.b import B
@@ -11,7 +10,6 @@ class TestModule:
         vm = SPyVM()
         w_mod = W_Module(vm, "mymod", "mymod.spy")
         vm.register_module(w_mod)
-        #
         fqn_a = FQN.make("mymod", "a", "")
         fqn_b = FQN.make("mymod", "b", "")
         w_a = vm.wrap(10)

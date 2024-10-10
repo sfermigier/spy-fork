@@ -78,7 +78,6 @@ def test_FQN_parse():
     assert fqn.modname == "aaa"
     assert fqn.attr == "bbb"
     assert fqn.suffix == ""
-    #
     fqn = FQN.parse("aaa::bbb#0")
     assert fqn.modname == "aaa"
     assert fqn.attr == "bbb"

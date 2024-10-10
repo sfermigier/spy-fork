@@ -4,16 +4,13 @@ from contextlib import contextmanager
 import subprocess
 import pytest
 import py.path
-from spy import ast
 from spy.compiler import Compiler
 from spy.backend.interp import InterpModuleWrapper
 from spy.backend.c.wrapper import WasmModuleWrapper
 from spy.cbuild import Toolchain, ZigToolchain
 from spy.errors import SPyError
-from spy.fqn import FQN
 from spy.vm.vm import SPyVM
 from spy.vm.module import W_Module
-from spy.vm.function import W_FuncType
 
 Backend = Literal["interp", "doppler", "C"]
 ALL_BACKENDS = Backend.__args__  # type: ignore
@@ -135,8 +132,7 @@ class CompilerTest:
         # either eager or lazy. For now, we hard-code it to eager.
         if self.backend == "interp":
             return "lazy"
-        else:
-            return "eager"
+        return "eager"
 
     # see test_backend_spy:test_zz_sanity_check for details
     SKIP_SPY_BACKEND_SANITY_CHECK = False
@@ -285,8 +281,7 @@ class ExeWrapper:
             # run with node
             out = subprocess.check_output(["node", self.f] + list(args))
             return out.decode("utf-8")
-        else:
-            raise NotImplementedError
+        raise NotImplementedError
 
 
 @pytest.mark.usefixtures("init")

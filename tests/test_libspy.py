@@ -60,10 +60,8 @@ class TestLibSPy(CTest):
         ll = LLSPyInstance.from_file(test_wasm)
         ptr_H = ll.read_global("H")
         assert ll.mem.read(ptr_H, 10) == mk_spy_Str(b"hello ")
-        #
         ptr_W = ll.call("mk_W")
         assert ll.mem.read(ptr_W, 9) == mk_spy_Str(b"world")
-        #
         ptr_HW = ll.call("spy_str_add", ptr_H, ptr_W)
         assert ll.mem.read(ptr_HW, 15) == mk_spy_Str(b"hello world")
 

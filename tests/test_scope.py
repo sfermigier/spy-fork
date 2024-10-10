@@ -1,14 +1,12 @@
-from typing import Any, Optional
+from typing import Any
 import textwrap
 import pytest
 from spy import ast
-from spy.ast_dump import dump
 from spy.fqn import FQN
 from spy.parser import Parser
 from spy.irgen.scope import ScopeAnalyzer
 from spy.irgen.symtable import Symbol, Color
 from spy.vm.vm import SPyVM
-from spy.vm.b import B
 from .support import expect_errors, MatchAnnotation
 
 MISSING = object()
@@ -161,7 +159,6 @@ class TestScopeAnalyzer:
             "@return": MatchSymbol("@return", "red"),
             "i32": MatchSymbol("i32", "blue", level=2),
         }
-        #
         bardef = foodef.body[2]
         assert isinstance(bardef, ast.FuncDef)
         assert bardef.symtable._symbols == {

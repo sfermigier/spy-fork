@@ -2,11 +2,10 @@ import fixedint
 import pytest
 from spy.vm.vm import SPyVM
 from spy.vm.b import B
-from spy.fqn import QN, FQN
+from spy.fqn import QN
 from spy.errors import SPyTypeError
 from spy.vm.object import W_Object, W_Type, spytype, W_Void, W_I32, W_Bool
 from spy.vm.str import W_Str
-from spy.vm.function import W_BuiltinFunc
 from spy.vm.module import W_Module
 
 
@@ -56,7 +55,6 @@ class TestVM:
         class W_Foo(W_Object):
             pass
 
-        #
         assert isinstance(W_Foo._w, W_Type)
         assert W_Foo._w.name == "foo"
         assert W_Foo._w.pyclass is W_Foo
@@ -66,12 +64,10 @@ class TestVM:
         class W_A(W_Object):
             pass
 
-        #
         @spytype("B")
         class W_B(W_A):
             pass
 
-        #
         w_None = W_Void._w_singleton
         assert W_Object._w.w_base is w_None
         assert W_A._w.w_base is W_Object._w
@@ -82,16 +78,13 @@ class TestVM:
         class W_A(W_Object):
             pass
 
-        #
         @spytype("B")
         class W_B(W_A):
             pass
 
-        #
         vm = SPyVM()
         w_a = W_A._w
         w_b = W_B._w
-        #
         assert vm.issubclass(w_a, B.w_object)
         assert vm.issubclass(w_b, B.w_object)
         assert vm.issubclass(w_a, w_a)
@@ -104,12 +97,10 @@ class TestVM:
         class W_A(W_Object):
             pass
 
-        #
         @spytype("B")
         class W_B(W_A):
             pass
 
-        #
         @spytype("C")
         class W_C(W_A):
             pass
@@ -118,7 +109,6 @@ class TestVM:
         w_a = W_A._w
         w_b = W_B._w
         w_c = W_C._w
-        #
         assert vm.union_type(w_a, w_a) is w_a
         assert vm.union_type(w_b, w_b) is w_b
         assert vm.union_type(w_a, w_b) is w_a
@@ -147,7 +137,6 @@ class TestVM:
         assert isinstance(w_None, W_Void)
         assert vm.dynamic_type(w_None).name == "void"
         assert repr(w_None) == "<spy None>"
-        #
         assert vm.wrap(None) is w_None
 
     def test_W_I32(self):
@@ -158,7 +147,6 @@ class TestVM:
         assert vm.dynamic_type(w_x) is B.w_i32
         assert repr(w_x) == "W_I32(123)"
         assert repr(B.w_i32) == "<spy type 'i32'>"
-        #
         x = vm.unwrap(w_x)
         y = vm.unwrap(w_y)
         assert x == 123
@@ -183,7 +171,6 @@ class TestVM:
         assert vm.wrap(False) is w_False
         assert vm.unwrap(w_True) is True
         assert vm.unwrap(w_False) is False
-        #
         assert vm.dynamic_type(w_True) is B.w_bool
         assert repr(w_True) == "W_Bool(True)"
         assert repr(w_False) == "W_Bool(False)"
@@ -216,7 +203,6 @@ class TestVM:
         vm = SPyVM()
         w_mod = W_Module(vm, "test", "...")
         vm.register_module(w_mod)
-        #
         a = vm.get_FQN(QN("test::a"), is_global=True)
         assert a.fullname == "test::a"
         with pytest.raises(AssertionError):

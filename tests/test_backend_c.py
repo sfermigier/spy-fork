@@ -61,7 +61,6 @@ class TestExpr:
         def cstr(b: bytes) -> str:
             return str(Literal.from_bytes(b))
 
-        #
         assert cstr(b"--hello--") == '"--hello--"'
         assert cstr(b'--"hello"--') == r'"--\"hello\"--"'
         assert cstr(rb"--aa\bb--") == r'"--aa\\bb--"'

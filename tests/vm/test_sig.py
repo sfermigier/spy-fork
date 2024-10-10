@@ -75,7 +75,6 @@ class TestSig:
 
         assert foo.w_functype.name == "def() -> void"
         assert foo(vm) is B.w_None
-        #
         w_foo = vm.wrap(foo)
         assert isinstance(w_foo, W_BuiltinFunc)
         w_res = vm.call(w_foo, [])

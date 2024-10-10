@@ -1,4 +1,3 @@
-import pytest
 from spy.llwasm import LLWasmModule, LLWasmInstance, HostModule
 from .support import CTest
 
@@ -52,7 +51,6 @@ class TestLLWasm(CTest):
         ll = LLWasmInstance.from_file(test_wasm)
         ptr = ll.read_global("hello", "void *")
         assert ll.mem.read(ptr, 6) == b"hello\0"
-        #
         ptr = ll.read_global("foo")
         assert ll.mem.read_i32(ptr) == 100
         assert ll.mem.read_i32(ptr + 4) == 200
@@ -68,7 +66,6 @@ class TestLLWasm(CTest):
         test_wasm = self.compile(src, exports=["foo", "foo_total"])
         ll = LLWasmInstance.from_file(test_wasm)
         assert ll.call("foo_total") == 60
-        #
         ptr = ll.read_global("foo")
         ll.mem.write(ptr, bytearray([40, 50, 60]))
         assert ll.call("foo_total") == 150
@@ -87,7 +84,6 @@ class TestLLWasm(CTest):
         assert ll1.call("inc") == 101
         assert ll1.call("inc") == 102
         assert ll1.call("inc") == 103
-        #
         assert ll2.call("inc") == 101
         assert ll2.call("inc") == 102
         assert ll2.call("inc") == 103

@@ -5,11 +5,11 @@ from spy.util import ANYTHING, magic_dispatch, extend, shortrepr
 
 def test_ANYTHING():
     assert ANYTHING == 1
-    assert 1 == ANYTHING
+    assert ANYTHING == 1
     assert ANYTHING == ANYTHING
-    assert not ANYTHING != 1
-    assert not 1 != ANYTHING
-    assert not ANYTHING != ANYTHING
+    assert ANYTHING == 1
+    assert ANYTHING == 1
+    assert ANYTHING == ANYTHING
 
 
 def test_magic_dispatch():

@@ -25,11 +25,10 @@ def pytest_collection_modifyitems(session, config, items):
         filename = item.fspath.relto(ROOT)
         if filename == "test_zz_mypy.py":
             return 100  # last
-        elif filename == "test_backend_spy.py":
+        if filename == "test_backend_spy.py":
             return 99  # second to last
-        elif filename.startswith("compiler/"):
+        if filename.startswith("compiler/"):
             return 98  # third to last
-        else:
-            return 0  # don't touch
+        return 0  # don't touch
 
     items.sort(key=key)

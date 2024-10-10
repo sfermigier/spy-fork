@@ -5,7 +5,7 @@ from spy import ast
 from spy.parser import Parser
 from spy.ast_dump import dump
 from spy.util import print_diff
-from .support import CompilerTest, expect_errors, MatchAnnotation
+from .support import expect_errors, MatchAnnotation
 
 
 @pytest.mark.usefixtures("init")
@@ -489,7 +489,6 @@ class TestParser:
             "@": "MatMul",
         }
         OpClass = binops[op]
-        #
         mod = self.parse(
             f"""
         def foo() -> i32:
@@ -517,7 +516,6 @@ class TestParser:
             "not": "Not",
         }
         OpClass = unops[op]
-        #
         mod = self.parse(
             f"""
         def foo() -> i32:
@@ -537,7 +535,7 @@ class TestParser:
     def test_negative_const(self):
         # special case -NUM, so that it's seen as a constant by the rest of the code
         mod = self.parse(
-            f"""
+            """
         def foo() -> i32:
             return -123
         """
@@ -567,7 +565,6 @@ class TestParser:
             "not in": "NotIn",
         }
         OpClass = cmpops[op]
-        #
         mod = self.parse(
             f"""
         def foo() -> i32:
@@ -777,7 +774,6 @@ class TestParser:
         from testmod import a, b as b2
         """
         )
-        #
         expected = """
         Module(
             filename='{tmpdir}/test.spy',
@@ -797,7 +793,6 @@ class TestParser:
         import ccc, ddd as DDD
         """
         )
-        #
         expected = """
         Module(
             filename='{tmpdir}/test.spy',
@@ -834,11 +829,9 @@ class TestParser:
         assert isclass(nodes[8], "Name") and nodes[8].id == "y"
         assert isclass(nodes[9], "Constant") and nodes[9].value == 1
         assert len(nodes) == 10
-        #
         nodes2 = list(mod.walk(ast.Stmt))
         expected2 = [node for node in nodes if isinstance(node, ast.Stmt)]
         assert nodes2 == expected2
-        #
         nodes3 = list(mod.walk(ast.Expr))
         expected3 = [node for node in nodes if isinstance(node, ast.Expr)]
         assert nodes3 == expected3
