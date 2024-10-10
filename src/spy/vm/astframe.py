@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 from spy import ast
 from spy.errors import (
     SPyTypeError,
-    SPyRuntimeError,
+    SPyRuntimeError
 )
 from spy.fqn import QN
 from spy.util import magic_dispatch
@@ -29,13 +29,13 @@ class Return(Exception):
 
 
 class ASTFrame:
-    vm: "SPyVM"
+    vm: SPyVM
     w_func: W_ASTFunc
     funcdef: ast.FuncDef
     _locals: Namespace
     t: TypeChecker
 
-    def __init__(self, vm: "SPyVM", w_func: W_ASTFunc) -> None:
+    def __init__(self, vm: SPyVM, w_func: W_ASTFunc) -> None:
         assert isinstance(w_func, W_ASTFunc)
         self.vm = vm
         self.w_func = w_func

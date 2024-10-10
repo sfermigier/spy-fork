@@ -1,9 +1,10 @@
-from typing import TYPE_CHECKING, Any
 from collections.abc import Callable
+from typing import TYPE_CHECKING, Any
+
 from spy.ast import Color
 from spy.fqn import QN
-from spy.vm.sig import spy_builtin, SPyBuiltin
 from spy.vm.object import W_Object, spytype
+from spy.vm.sig import spy_builtin, SPyBuiltin
 
 
 class ModuleRegistry:

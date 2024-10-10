@@ -1,10 +1,11 @@
 from typing import TYPE_CHECKING
-from spy.llwasm import LLWasmInstance
+
 from spy.fqn import QN
-from spy.vm.object import W_Object, spytype, W_I32
-from spy.vm.sig import spy_builtin
-from spy.vm.opimpl import W_OpImpl, W_Value
+from spy.llwasm import LLWasmInstance
 from spy.vm.list import W_List
+from spy.vm.object import W_Object, spytype, W_I32
+from spy.vm.opimpl import W_OpImpl, W_Value
+from spy.vm.sig import spy_builtin
 
 if TYPE_CHECKING:
     from spy.vm.vm import SPyVM

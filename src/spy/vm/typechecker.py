@@ -1,18 +1,21 @@
-from typing import TYPE_CHECKING, NoReturn, Literal
+from __future__ import annotations
+
 from types import NoneType
+from typing import TYPE_CHECKING, NoReturn, Literal
+
 from spy import ast
-from spy.irgen.symtable import Symbol, Color
 from spy.errors import SPyTypeError, SPyNameError, maybe_plural
+from spy.irgen.symtable import Symbol, Color
 from spy.location import Loc
+from spy.util import magic_dispatch
+from spy.vm.b import B
+from spy.vm.function import W_FuncType, W_ASTFunc
+from spy.vm.list import W_List
+from spy.vm.modules.jsffi import JSFFI
+from spy.vm.modules.operator import OP
 from spy.vm.object import W_Type
 from spy.vm.opimpl import W_OpImpl, W_Value
-from spy.vm.list import W_List
-from spy.vm.function import W_FuncType, W_ASTFunc
-from spy.vm.b import B
-from spy.vm.modules.operator import OP
-from spy.vm.modules.jsffi import JSFFI
 from spy.vm.typeconverter import TypeConverter, DynamicCast, NumericConv, JsRefConv
-from spy.util import magic_dispatch
 
 if TYPE_CHECKING:
     from spy.vm.vm import SPyVM
@@ -40,7 +43,7 @@ def maybe_blue(*colors: Color) -> Color:
 
 
 class TypeChecker:
-    vm: "SPyVM"
+    vm: SPyVM
     w_func: W_ASTFunc
     funcef: ast.FuncDef
     expr_types: dict[ast.Expr, tuple[Color, W_Type]]
@@ -48,7 +51,7 @@ class TypeChecker:
     opimpl: dict[ast.Node, W_OpImpl]
     locals_types_w: dict[str, W_Type]
 
-    def __init__(self, vm: "SPyVM", w_func: W_ASTFunc) -> None:
+    def __init__(self, vm: SPyVM, w_func: W_ASTFunc) -> None:
         self.vm = vm
         self.w_func = w_func
         self.funcdef = w_func.funcdef
@@ -406,7 +409,7 @@ class TypeChecker:
 
 
 def typecheck_opimpl(
-    vm: "SPyVM",
+    vm: SPyVM,
     w_opimpl: W_OpImpl,
     orig_args_wv: list[W_Value],
     *,
@@ -522,7 +525,7 @@ def _call_error_wrong_argcount(
 
 
 def convert_type_maybe(
-    vm: "SPyVM", wv_x: W_Value, w_exp: W_Type
+    vm: SPyVM, wv_x: W_Value, w_exp: W_Type
 ) -> TypeConverter | None:
     """
     Check whether the given W_Value is compatible with the expected type:
