@@ -1,13 +1,16 @@
-from typing import Any
 import textwrap
+from typing import Any
+
 import pytest
+
 from spy import ast
 from spy.fqn import FQN
-from spy.parser import Parser
 from spy.irgen.scope import ScopeAnalyzer
-from spy.irgen.symtable import Symbol, Color
+from spy.irgen.symtable import Color, Symbol
+from spy.parser import Parser
 from spy.vm.vm import SPyVM
-from .support import expect_errors, MatchAnnotation
+
+from .support import MatchAnnotation, expect_errors
 
 MISSING = object()
 

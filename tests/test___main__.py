@@ -1,11 +1,12 @@
-from typing import Any
 import re
 import textwrap
 from subprocess import getstatusoutput
+from typing import Any
+
 import pytest
 from typer.testing import CliRunner
-from spy.__main__ import app
 
+from spy.__main__ import app
 
 # https://stackoverflow.com/a/14693789
 # 7-bit C1 ANSI sequences

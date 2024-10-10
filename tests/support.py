@@ -1,16 +1,18 @@
-from typing import Any, Literal, Optional, no_type_check
+import subprocess
 import textwrap
 from contextlib import contextmanager
-import subprocess
-import pytest
+from typing import Any, Literal, Optional, no_type_check
+
 import py.path
-from spy.compiler import Compiler
-from spy.backend.interp import InterpModuleWrapper
+import pytest
+
 from spy.backend.c.wrapper import WasmModuleWrapper
+from spy.backend.interp import InterpModuleWrapper
 from spy.cbuild import Toolchain, ZigToolchain
+from spy.compiler import Compiler
 from spy.errors import SPyError
-from spy.vm.vm import SPyVM
 from spy.vm.module import W_Module
+from spy.vm.vm import SPyVM
 
 Backend = Literal["interp", "doppler", "C"]
 ALL_BACKENDS = Backend.__args__  # type: ignore

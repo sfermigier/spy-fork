@@ -1,7 +1,10 @@
 from subprocess import getstatusoutput
+
 import pytest
-from spy.llwasm import LLWasmInstance
+
 from spy.cbuild import get_toolchain
+from spy.llwasm import LLWasmInstance
+
 from .support import CTest
 
 

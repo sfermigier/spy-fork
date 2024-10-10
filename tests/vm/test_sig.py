@@ -1,9 +1,10 @@
 import pytest
-from spy.vm.vm import SPyVM
-from spy.vm.w import W_FuncType, W_I32, W_BuiltinFunc, W_Dynamic, W_Str
-from spy.vm.b import B
+
 from spy.fqn import QN
-from spy.vm.sig import spy_builtin, functype_from_sig
+from spy.vm.b import B
+from spy.vm.sig import functype_from_sig, spy_builtin
+from spy.vm.vm import SPyVM
+from spy.vm.w import W_I32, W_BuiltinFunc, W_Dynamic, W_FuncType, W_Str
 
 
 class TestSig:

@@ -1,7 +1,6 @@
 
 import struct
 
-
 from ..support import CompilerTest
 
 

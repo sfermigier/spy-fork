@@ -1,6 +1,8 @@
 from typing import Any
+
 import pytest
-from spy.util import ANYTHING, magic_dispatch, extend, shortrepr
+
+from spy.util import ANYTHING, extend, magic_dispatch, shortrepr
 
 
 def test_ANYTHING():

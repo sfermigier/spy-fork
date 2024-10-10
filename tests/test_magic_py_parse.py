@@ -1,6 +1,7 @@
 import textwrap
-from spy.magic_py_parse import magic_py_parse, preprocess
+
 from spy.ast_dump import dump
+from spy.magic_py_parse import magic_py_parse, preprocess
 
 
 def test_preprocess_plain():

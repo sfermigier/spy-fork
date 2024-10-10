@@ -1,8 +1,8 @@
+import os
+import pathlib
 from unittest import skip
 
 import pytest
-import os
-import pathlib
 
 ROOT = pathlib.Path(__file__).parent.parent.parent
 

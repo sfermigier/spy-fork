@@ -1,4 +1,5 @@
-from spy.llwasm import LLWasmModule, LLWasmInstance, HostModule
+from spy.llwasm import HostModule, LLWasmInstance, LLWasmModule
+
 from .support import CTest
 
 

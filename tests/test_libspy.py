@@ -1,7 +1,10 @@
 import struct
+
 import pytest
-from spy.llwasm import LLWasmModule
+
 from spy.libspy import LLSPyInstance, SPyPanicError
+from spy.llwasm import LLWasmModule
+
 from .support import CTest
 
 

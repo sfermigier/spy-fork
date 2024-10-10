@@ -1,12 +1,13 @@
 import fixedint
 import pytest
-from spy.vm.vm import SPyVM
-from spy.vm.b import B
-from spy.fqn import QN
+
 from spy.errors import SPyTypeError
-from spy.vm.object import W_Object, W_Type, spytype, W_Void, W_I32, W_Bool
-from spy.vm.str import W_Str
+from spy.fqn import QN
+from spy.vm.b import B
 from spy.vm.module import W_Module
+from spy.vm.object import W_I32, W_Bool, W_Object, W_Type, W_Void, spytype
+from spy.vm.str import W_Str
+from spy.vm.vm import SPyVM
 
 
 class TestVM:

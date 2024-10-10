@@ -1,5 +1,6 @@
 import pytest
-from spy.fqn import QN, FQN
+
+from spy.fqn import FQN, QN
 
 
 def test_QN_init_fullname():

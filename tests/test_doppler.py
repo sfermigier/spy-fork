@@ -1,8 +1,10 @@
 import textwrap
+
 import pytest
-from spy.vm.vm import SPyVM
-from spy.backend.spy import SPyBackend, FQN_FORMAT
+
+from spy.backend.spy import FQN_FORMAT, SPyBackend
 from spy.util import print_diff
+from spy.vm.vm import SPyVM
 
 
 @pytest.mark.usefixtures("init")

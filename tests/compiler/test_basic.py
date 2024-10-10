@@ -4,8 +4,7 @@ from spy.errors import SPyTypeError
 from spy.fqn import FQN
 from spy.vm.b import B
 
-from ..support import (CompilerTest, expect_errors, no_C,
-                       skip_backends)
+from ..support import CompilerTest, expect_errors, no_C, skip_backends
 
 
 class TestBasic(CompilerTest):
